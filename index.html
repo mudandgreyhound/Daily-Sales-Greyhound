@@ -306,7 +306,7 @@ tbody tr:last-child td{border-bottom:none}
       <span id="stxt">ยังไม่ได้โหลด</span>
     </div>
     <button class="btn-outline" onclick="openExport()">⬇ Export</button>
-    <button class="btn"         onclick="fetchData()">⟳ รีเฟรช</button>
+    <button class="btn"         onclick="refresh()">⟳ รีเฟรช</button>
     <button class="btn-outline" onclick="loadDemo()">Demo</button>
   </div>
 </header>
@@ -318,91 +318,71 @@ tbody tr:last-child td{border-bottom:none}
 <main class="page">
   <div class="errbanner" id="errBanner"></div>
 
-  <!-- ⚡ REALTIME (store-direct) -->
+  <!-- PERIOD SELECTOR (บนสุด คุมทั้งหน้า) -->
   <div class="sh" style="margin-top:4px">
-    <span class="sl">⚡ สด — Realtime (ตรงจากสาขา)</span>
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <label class="rt-auto"><input type="checkbox" id="rtAuto" checked onchange="rtTimer()"> auto 30 วิ</label>
-      <span class="dbadge" id="rtUpdated">—</span>
-      <button class="btn" onclick="rtFetch()" style="padding:5px 12px;font-size:11px">⟳ สด</button>
-    </div>
-  </div>
-
-  <div class="hero" style="background:linear-gradient(135deg,rgba(21,147,90,.95),rgba(14,165,183,.9) 60%,rgba(109,94,252,.82))">
-    <div class="hero-side">
-      <div class="hero-side-val" id="rtBills">—</div>
-      <div class="hero-side-lbl">บิลวันนี้</div>
-    </div>
-    <div class="hero-center">
-      <div class="hero-label">ยอดขายสดวันนี้ — Incl. VAT</div>
-      <div class="hero-value" id="rtSales">—</div>
-      <div class="hero-sub" id="rtReport">—</div>
-    </div>
-    <div class="hero-side">
-      <div class="hero-side-val" id="rtAvg">—</div>
-      <div class="hero-side-lbl">เฉลี่ย / บิล</div>
-    </div>
-  </div>
-
-  <div class="target-card">
-    <div class="tc-head">
-      <div class="tc-title">สถานะสาขา</div>
-      <div class="tc-summary" id="rtLastPull">—</div>
-    </div>
-    <div class="rt-dots" id="rtDots"><span style="color:var(--muted);font-size:12px">กำลังโหลด...</span></div>
-  </div>
-
-  <div class="rt-grid">
-    <div class="ccard">
-      <h4>ยอดสดตามสาขา</h4>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>สาขา</th><th class="r">บิล</th><th class="r">ยอด</th><th class="r">บิลล่าสุด</th></tr></thead>
-        <tbody id="rtStoreBody"></tbody>
-      </table></div>
-    </div>
-    <div class="ccard">
-      <h4>Top สินค้า (วันนี้)</h4>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>Item</th><th class="r">ชิ้น</th><th class="r">ยอด</th></tr></thead>
-        <tbody id="rtTopBody"></tbody>
-      </table></div>
-    </div>
-    <div class="ccard">
-      <h4>โปรโมชัน (วันนี้)</h4>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>Promo</th><th class="r">ชิ้น</th><th class="r">ยอด</th></tr></thead>
-        <tbody id="rtPromoBody"></tbody>
-      </table></div>
-    </div>
-  </div>
-
-  <!-- HERO -->
-  <div class="sh" style="margin-top:4px">
-    <span class="sl">ภาพรวม</span>
+    <span class="sl" id="viewLabel">ภาพรวม</span>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <div class="tabs" id="periodTabs" style="margin-bottom:0">
         <button class="tab on" data-period="today"     onclick="setPeriod('today',this)">วันนี้</button>
         <button class="tab"    data-period="yesterday" onclick="setPeriod('yesterday',this)">เมื่อวานนี้</button>
         <button class="tab"    data-period="month"     onclick="setPeriod('month',this)">เดือนนี้</button>
       </div>
-      <span class="dbadge" id="drBadge">—</span>
+      <input type="date" id="pFrom" class="form-input" style="width:auto;padding:4px 10px;font-size:12px" onchange="pickDate()">
+      <span style="font-size:11px;color:var(--muted)">–</span>
+      <input type="date" id="pTo"   class="form-input" style="width:auto;padding:4px 10px;font-size:12px" onchange="pickDate()">
+      <label class="rt-auto" id="autoWrap"><input type="checkbox" id="rtAuto" checked onchange="rtTimer()"> auto 30 วิ</label>
+      <span class="dbadge" id="vUpdated">—</span>
+      <button class="btn" onclick="refresh()" style="padding:5px 12px;font-size:11px">⟳</button>
     </div>
   </div>
-  <div class="hero">
+
+  <!-- UNIFIED HERO (วันนี้=realtime / อื่นๆ=GHBLIVE) -->
+  <div class="hero" id="mainHero">
     <div class="hero-side">
-      <div class="hero-side-val" id="hOrders">—</div>
-      <div class="hero-side-lbl">จำนวนออเดอร์</div>
+      <div class="hero-side-val" id="hBills">—</div>
+      <div class="hero-side-lbl" id="hBillsLbl">บิล</div>
     </div>
     <div class="hero-center">
-      <div class="hero-label">ยอดขาย — Net Amount</div>
-      <div class="hero-value" id="heroNet">—</div>
-      <div class="hero-sub" id="heroSub">—</div>
-      <div style="margin-top:8px;font-size:15px;font-weight:600;color:rgba(255,255,255,.85);font-family:'JetBrains Mono',monospace" id="heroGross">—</div>
-      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:2px;letter-spacing:.05em;text-transform:uppercase">Gross Amount (Inc. VAT)</div>
+      <div class="hero-label" id="hLabel">ยอดขาย</div>
+      <div class="hero-value" id="hSales">—</div>
+      <div class="hero-sub" id="hSub">—</div>
     </div>
     <div class="hero-side">
       <div class="hero-side-val" id="hAvg">—</div>
-      <div class="hero-side-lbl">เฉลี่ย / ออเดอร์</div>
+      <div class="hero-side-lbl">เฉลี่ย / บิล</div>
+    </div>
+  </div>
+
+  <!-- STATUS สาขา -->
+  <div class="target-card">
+    <div class="tc-head">
+      <div class="tc-title" id="statusTitle">สถานะสาขา</div>
+      <div class="tc-summary" id="statusSummary">—</div>
+    </div>
+    <div class="rt-dots" id="statusDots"><span style="color:var(--muted);font-size:12px">กำลังโหลด...</span></div>
+  </div>
+
+  <div class="rt-grid">
+    <div class="ccard">
+      <h4 id="storeTitle">ยอดตามสาขา</h4>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>สาขา</th><th class="r">บิล</th><th class="r">ยอด</th><th class="r" id="storeCol4">บิลล่าสุด</th></tr></thead>
+        <tbody id="storeBody"></tbody>
+      </table></div>
+    </div>
+    <div class="ccard">
+      <h4>Top สินค้า</h4>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Item</th><th class="r">ชิ้น</th><th class="r">ยอด</th></tr></thead>
+        <tbody id="topBody"></tbody>
+      </table></div>
+    </div>
+    <div class="ccard">
+      <h4>โปรโมชัน</h4>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Promo</th><th class="r">ชิ้น</th><th class="r">ยอด</th></tr></thead>
+        <tbody id="promoBody"></tbody>
+      </table></div>
     </div>
   </div>
 
@@ -494,18 +474,13 @@ const fmtD = n  => new Intl.NumberFormat('th-TH',{minimumFractionDigits:2,maximu
 
 let mainChart=null, curTab='daily', curData=null, curPeriod='today';
 
-/* ── RENDER ─────────────────────────────────── */
+/* ── RENDER (บล็อกล่าง: target + chart — hero คุมแยกใน loader) ── */
 function render(d, targetData){
   curData = d;
   const dr = d.dateRange||'—';
-  ['drSub','drBadge','chartBadge'].forEach(id=>$(id).textContent=dr);
+  if($('drSub')) $('drSub').textContent = dr;
+  $('chartBadge').textContent = dr;
   $('genTime').textContent = 'อัปเดต '+(d.generated||'—');
-  const net = d.net||0;
-  animTo('heroNet', 0, net,              v=>'฿'+fmtM(Math.round(v)));
-  animTo('hOrders', 0, d.orders||0,      v=>Math.round(v).toLocaleString('th-TH'));
-  animTo('hAvg',    0, d.avgPerOrder||0, v=>'฿'+fmtM(Math.round(v)));
-  $('heroSub').textContent = `${(d.orders||0).toLocaleString('th-TH')} ออเดอร์`;
-  $('heroGross').textContent = '฿' + fmtM(d.gross||0);
   const t = targetData || d;
   $('tgtBadge').textContent = t.dateRange||'—';
   buildTarget(t.storeList||[]);
@@ -679,34 +654,44 @@ function getRange(period){
   return {dateFrom:monthStartStr(), dateTo:todayStr()}; // month (default)
 }
 
+function curRange(){
+  if(curPeriod==='custom') return {dateFrom:$('pFrom').value, dateTo:$('pTo').value};
+  return getRange(curPeriod);
+}
+
 function setPeriod(period,btn){
   curPeriod=period;
   document.querySelectorAll('#periodTabs .tab').forEach(x=>x.classList.remove('on'));
   btn.classList.add('on');
-  fetchData();
+  const {dateFrom,dateTo}=curRange();
+  $('pFrom').value=dateFrom;$('pTo').value=dateTo;
+  refresh();
 }
 
-async function fetchData(){
-  const {dateFrom,dateTo}=getRange(curPeriod);
-  const needsMonth=curPeriod!=='month'; // Sales Target card always tracks the full month
-  $('detailDateFrom').value=dateTo;$('detailDateTo').value=dateTo;
-  $('loader').classList.add('show');setStatus('','กำลังโหลด…');hideErr();
+function pickDate(){
+  if(!$('pFrom').value||!$('pTo').value) return;
+  if($('pFrom').value>$('pTo').value){alert('วันที่เริ่มต้นต้องไม่เกินวันที่สิ้นสุด');return;}
+  curPeriod='custom';
+  document.querySelectorAll('#periodTabs .tab').forEach(x=>x.classList.remove('on'));
+  refresh();
+}
+
+async function refresh(){
+  const {dateFrom,dateTo}=curRange();
+  const isToday=(curPeriod==='today');
+  $('autoWrap').style.display = isToday ? '' : 'none';
+  $('mainHero').style.background = isToday ? HERO_TODAY : HERO_HIST;
+  $('viewLabel').textContent = isToday ? '⚡ สด — Realtime (ตรงจากสาขา)' : 'ภาพรวม';
+  $('storeCol4').textContent = isToday ? 'บิลล่าสุด' : '';
+  if($('drSub')) $('drSub').textContent = isToday ? 'วันนี้ (สด)' : `${dateFrom} – ${dateTo}`;
+  $('loader').classList.add('show'); setStatus('','กำลังโหลด…'); hideErr();
   try{
-    const reqs=[
-      fetch(`${API}?date_from=${dateFrom}&date_to=${dateTo}`),
-      fetch(`${API_DET}?date_from=${dateTo}&date_to=${dateTo}`)
-    ];
-    if(needsMonth) reqs.push(fetch(`${API}?date_from=${monthStartStr()}&date_to=${todayStr()}`));
-    const [r1,r2,r3]=await Promise.all(reqs);
-    if(!r1.ok) throw new Error('API HTTP '+r1.status);
-    const data=await r1.json();
-    if(data.error) throw new Error(data.error);
-    const monthData=needsMonth&&r3&&r3.ok ? await r3.json() : null;
-    render(data, monthData);
-    if(r2.ok){const det=await r2.json();buildDetailTable(det.rows||[]);$('stBadge').textContent=dateTo;}
-    setStatus('live','เชื่อมต่อแล้ว');
+    if(isToday){ await loadTopRealtime(); rtTimer(); }
+    else       { rtStop(); await loadTopHistory(dateFrom,dateTo); }
+    await loadLower(dateFrom,dateTo);
+    setStatus('live', isToday?'สด (store-direct)':'เชื่อมต่อแล้ว');
   }catch(e){
-    setStatus('','โหมดตัวอย่าง · ยังเชื่อม API ไม่ได้');loadDemo();
+    setStatus('','โหมดตัวอย่าง · ยังเชื่อม API ไม่ได้'); loadDemo();
   }finally{$('loader').classList.remove('show');}
 }
 
@@ -917,11 +902,11 @@ async function doExportExcel(){
   closeExport();
 }
 
-/* ── DEMO ────────────────────────────────────── */
+/* ── DEMO (ตอนต่อ API ไม่ได้) ─────────────────── */
 function loadDemo(){
   hideErr();setStatus('live','Demo mode');
   const t=todayStr();$('detailDateFrom').value=t;$('detailDateTo').value=t;
-  render({
+  const demo={
     dateRange:'01/08/2026 – 14/08/2026',generated:'14/08/2026 16:45',
     net:5723871,gross:6124401,orders:3413,avgPerOrder:1677,
     daily:{
@@ -936,64 +921,50 @@ function loadDemo(){
       {name:'SHS',rev:280000,items:320,rec:160},{name:'SCP',rev:220000,items:280,rec:110},
       {name:'GPG',rev:180000,items:140,rec:72},{name:'TTS',rev:98083,items:200,rec:100}
     ]
-  });
+  };
+  $('mainHero').style.background=HERO_HIST;
+  $('hLabel').textContent='ยอดขาย — Incl. VAT (Demo)';
+  $('hSales').textContent='฿'+fmtM(demo.gross);
+  $('hBills').textContent=demo.orders.toLocaleString('th-TH');$('hBillsLbl').textContent='จำนวนบิล';
+  $('hAvg').textContent='฿'+fmtM(demo.avgPerOrder);$('hSub').textContent='Net ฿'+fmtM(demo.net);
+  $('statusTitle').textContent='สาขาที่มียอด (Demo)';$('statusSummary').textContent=demo.storeList.length+' สาขา';
+  $('storeCol4').textContent='';
+  renderDots(demo.storeList.map(s=>({store:s.name,state:'ok',tail:'฿'+fmtM(s.rev),tip:s.name})));
+  $('storeBody').innerHTML=demo.storeList.map(x=>storeRow(x.name,x.rec,x.rev,null)).join('');
+  renderTopList([{item:'DEMO-ITEM',name:'สินค้าตัวอย่าง',qty:5,sales:12500}]);
+  renderPromoList([{promotion:'D00000',name:'โปรตัวอย่าง',qty:3,sales:5400}]);
+  render(demo,demo);
   buildDetailTable([
     {store:'CCL',receipt:'P02517733',itemNo:'A25ME03162WH1A',variantCode:'S',price:697.50,qty:1,netAmount:651.87,vatAmount:45.63,date:'14/08/2026',time:'11:30:09',itemCategory:'ME',productGroup:'ME03',salesStaff:'PHANNIPA'},
     {store:'EML',receipt:'P00729965',itemNo:'S26MD03032BL1A',variantCode:'M',price:1595.00,qty:1,netAmount:745.33,vatAmount:52.17,date:'14/08/2026',time:'12:48:01',itemCategory:'MD',productGroup:'MD03',salesStaff:'CHAKRIT'},
-    {store:'MEC',receipt:'P02650470',itemNo:'A25ME09012WH1A',variantCode:'40',price:1750.00,qty:1,netAmount:1635.51,vatAmount:114.49,date:'14/08/2026',time:'09:50:01',itemCategory:'ME',productGroup:'ME09',salesStaff:'WEBSITE'},
   ]);
 }
 
-/* ── REALTIME (store-direct) ─────────────────── */
-const RT_BASE = "https://greyhound_api.mobile1234.site/api/rt";
-let rtInterval = null;
+/* ── DATA LOADERS (สลับ source ตาม period) ─────────────── */
+const RT_BASE   = "https://greyhound_api.mobile1234.site/api/rt";
+const HIST_BASE = "https://greyhound_api.mobile1234.site/api/hist";
+const HERO_TODAY = 'linear-gradient(135deg,rgba(21,147,90,.95),rgba(14,165,183,.9) 60%,rgba(109,94,252,.82))';
+const HERO_HIST  = 'linear-gradient(135deg,rgba(109,94,252,.95),rgba(139,92,246,.88) 45%,rgba(14,165,183,.82))';
+let rtInterval=null, _histSales=null;
 
 function rtEmpty(c){return `<tr><td colspan="${c}" style="text-align:center;color:var(--muted);padding:16px">—</td></tr>`;}
 
-async function rtFetch(){
-  try{
-    const [p,t,pr] = await Promise.all([
-      fetch(`${RT_BASE}/pulse`).then(r=>r.json()),
-      fetch(`${RT_BASE}/top`).then(r=>r.json()),
-      fetch(`${RT_BASE}/promotion`).then(r=>r.json())
-    ]);
-    rtRenderPulse(p);
-    rtRenderTop(t);
-    rtRenderPromo(pr);
-    $('rtUpdated').textContent = 'สด ' + (p.generated||'—');
-  }catch(e){
-    $('rtUpdated').textContent = 'ต่อ API สดไม่ได้';
-  }
+function renderDots(items){
+  $('statusDots').innerHTML = items.length ? items.map(s=>
+    `<span class="rt-chip ${s.state}" title="${s.tip}"><span class="d"></span>${s.store}<span class="t">${s.tail}</span></span>`
+  ).join('') : '<span style="color:var(--muted);font-size:12px">ยังไม่มีข้อมูล</span>';
 }
-
-function rtRenderPulse(p){
-  const sm = p.summary||{}, shops = p.shops||[];
-  $('rtSales').textContent = '฿' + fmtM(sm.totalSales||0);
-  $('rtBills').textContent = (sm.totalBills||0).toLocaleString('th-TH');
-  const avg = sm.totalBills ? Math.round((sm.totalSales||0)/sm.totalBills) : 0;
-  $('rtAvg').textContent = '฿' + fmtM(avg);
-  $('rtReport').textContent = `${sm.shopsReporting||0}/${sm.shopsTotal||0} สาขาส่งข้อมูล · error ${sm.shopsError||0}`;
-  $('rtLastPull').textContent = 'ดึงล่าสุด ' + (sm.lastPull||'—');
-
-  $('rtDots').innerHTML = shops.length ? shops.map(s=>{
-    const cls = s.status==='error' ? 'err' : (s.bills>0 ? 'ok' : 'idle');
-    const tail = s.status==='error' ? '✕' : (s.lastBill||'—');
-    const tip = s.status==='error' ? 'ต่อไม่ติด' : (s.lastBill ? 'บิลล่าสุด '+s.lastBill : 'ยังไม่มีบิล');
-    return `<span class="rt-chip ${cls}" title="${s.store} · ${tip}"><span class="d"></span>${s.store}<span class="t">${tail}</span></span>`;
-  }).join('') : '<span style="color:var(--muted);font-size:12px">ยังไม่มีข้อมูล</span>';
-
-  const rep = shops.filter(s=>s.bills>0);
-  $('rtStoreBody').innerHTML = rep.length ? rep.map(x=>`<tr>
-    <td class="mono" style="font-weight:600">${x.store}</td>
-    <td class="r">${x.bills}</td>
-    <td class="r mono" style="font-weight:600">฿${fmtM(x.sales)}</td>
-    <td class="r mono" style="font-size:10px;color:var(--muted)">${x.lastBill||'—'}</td>
-  </tr>`).join('') : rtEmpty(4);
+function storeRow(store,bills,sales,last){
+  return `<tr>
+    <td class="mono" style="font-weight:600">${store}</td>
+    <td class="r">${bills}</td>
+    <td class="r mono" style="font-weight:600">฿${fmtM(sales)}</td>
+    <td class="r mono" style="font-size:10px;color:var(--muted)">${last||'—'}</td>
+  </tr>`;
 }
-
-function rtRenderTop(t){
-  const rows = (t.rows||[]).slice(0,10);
-  $('rtTopBody').innerHTML = rows.length ? rows.map(x=>`<tr>
+function renderTopList(rows){
+  rows=(rows||[]).slice(0,10);
+  $('topBody').innerHTML = rows.length ? rows.map(x=>`<tr>
     <td>${x.name
       ? `<div style="font-weight:600;font-size:11px">${x.name}</div><div class="mono" style="font-size:9px;color:var(--muted)">${x.item}</div>`
       : `<span class="mono" style="font-size:10px">${x.item}</span>`}</td>
@@ -1001,10 +972,9 @@ function rtRenderTop(t){
     <td class="r mono">฿${fmtM(x.sales)}</td>
   </tr>`).join('') : rtEmpty(3);
 }
-
-function rtRenderPromo(pr){
-  const rows = (pr.rows||[]).slice(0,10);
-  $('rtPromoBody').innerHTML = rows.length ? rows.map(x=>`<tr>
+function renderPromoList(rows){
+  rows=(rows||[]).slice(0,10);
+  $('promoBody').innerHTML = rows.length ? rows.map(x=>`<tr>
     <td>${x.name
       ? `<div style="font-weight:600;font-size:11px">${x.name}</div><div class="mono" style="font-size:9px;color:var(--muted)">${x.promotion}</div>`
       : `<span class="mono">${x.promotion}</span>`}</td>
@@ -1013,12 +983,78 @@ function rtRenderPromo(pr){
   </tr>`).join('') : rtEmpty(3);
 }
 
-function rtTimer(){
-  if(rtInterval){clearInterval(rtInterval);rtInterval=null;}
-  if($('rtAuto').checked) rtInterval = setInterval(rtFetch, 30000);
+/* วันนี้ → realtime (store-direct) */
+async function loadTopRealtime(){
+  const [p,t,pr] = await Promise.all([
+    fetch(`${RT_BASE}/pulse`).then(r=>r.json()),
+    fetch(`${RT_BASE}/top`).then(r=>r.json()),
+    fetch(`${RT_BASE}/promotion`).then(r=>r.json())
+  ]);
+  const sm=p.summary||{}, shops=p.shops||[];
+  $('hLabel').textContent='ยอดขายสดวันนี้ — Incl. VAT';
+  $('hSales').textContent='฿'+fmtM(sm.totalSales||0);
+  $('hBills').textContent=(sm.totalBills||0).toLocaleString('th-TH');
+  $('hBillsLbl').textContent='บิลวันนี้';
+  $('hAvg').textContent='฿'+fmtM(sm.totalBills?Math.round((sm.totalSales||0)/sm.totalBills):0);
+  $('hSub').textContent=`${sm.shopsReporting||0}/${sm.shopsTotal||0} สาขาส่งข้อมูล · error ${sm.shopsError||0}`;
+  $('statusTitle').textContent='สถานะสาขา (live)';
+  $('statusSummary').textContent='ดึงล่าสุด '+(sm.lastPull||'—');
+  renderDots(shops.map(s=>({store:s.store,
+    state:s.status==='error'?'err':(s.bills>0?'ok':'idle'),
+    tail:s.status==='error'?'✕':(s.lastBill||'—'),
+    tip:`${s.store} · ${s.status==='error'?'ต่อไม่ติด':(s.lastBill?'บิลล่าสุด '+s.lastBill:'ยังไม่มีบิล')}`})));
+  const rep=shops.filter(s=>s.bills>0);
+  $('storeBody').innerHTML = rep.length ? rep.map(x=>storeRow(x.store,x.bills,x.sales,x.lastBill)).join('') : rtEmpty(4);
+  renderTopList(t.rows);
+  renderPromoList(pr.rows);
+  $('vUpdated').textContent='สด '+(p.generated||'—');
 }
 
-window.onload=()=>{fetchData();rtFetch();rtTimer();};
+/* เมื่อวานนี้/เดือนนี้/เลือกวันที่ → GHBLIVE */
+async function loadTopHistory(from,to){
+  const [sales,t,pr]=await Promise.all([
+    fetch(`${API}?date_from=${from}&date_to=${to}`).then(r=>r.ok?r.json():null),
+    fetch(`${HIST_BASE}/top?date_from=${from}&date_to=${to}`).then(r=>r.json()),
+    fetch(`${HIST_BASE}/promotion?date_from=${from}&date_to=${to}`).then(r=>r.json())
+  ]);
+  _histSales=sales;
+  const net=sales?sales.net:0, gross=sales?sales.gross:0, orders=sales?sales.orders:0;
+  $('hLabel').textContent='ยอดขาย — Incl. VAT';
+  $('hSales').textContent='฿'+fmtM(gross);
+  $('hBills').textContent=(orders).toLocaleString('th-TH');
+  $('hBillsLbl').textContent='จำนวนบิล';
+  $('hAvg').textContent='฿'+fmtM(orders?Math.round(gross/orders):0);
+  $('hSub').textContent='Net ฿'+fmtM(net);
+  const sl=(sales&&sales.storeList)||[];
+  $('statusTitle').textContent='สาขาที่มียอด';
+  $('statusSummary').textContent=sl.length+' สาขา';
+  renderDots(sl.map(s=>({store:s.name,state:'ok',tail:'฿'+fmtM(s.rev),tip:`${s.name} · ฿${fmtM(s.rev)}`})));
+  $('storeBody').innerHTML = sl.length ? sl.map(x=>storeRow(x.name,x.rec,x.rev,null)).join('') : rtEmpty(4);
+  renderTopList(t.rows);
+  renderPromoList(pr.rows);
+  $('vUpdated').textContent='GHBLIVE '+(sales?sales.generated:'—');
+}
+
+/* บล็อกล่าง (GHBLIVE เสมอ): target + chart + detail */
+async function loadLower(from,to){
+  const sales = _histSales || await fetch(`${API}?date_from=${from}&date_to=${to}`).then(r=>r.ok?r.json():null);
+  _histSales=null;
+  if(!sales) throw new Error('no sales data');
+  const monthData = await fetch(`${API}?date_from=${monthStartStr()}&date_to=${todayStr()}`).then(r=>r.ok?r.json():null);
+  render(sales, monthData||sales);
+  $('detailDateFrom').value=from;$('detailDateTo').value=to;
+  const det = await fetch(`${API_DET}?date_from=${from}&date_to=${to}`).then(r=>r.ok?r.json():null);
+  buildDetailTable((det&&det.rows)||[]);
+  $('stBadge').textContent = from===to?from:`${from} – ${to}`;
+}
+
+function rtTimer(){
+  rtStop();
+  if($('rtAuto')&&$('rtAuto').checked&&curPeriod==='today') rtInterval=setInterval(loadTopRealtime,30000);
+}
+function rtStop(){ if(rtInterval){clearInterval(rtInterval);rtInterval=null;} }
+
+window.onload=()=>{ const t=todayStr(); $('pFrom').value=t; $('pTo').value=t; refresh(); };
 </script>
 
 </body></html>
