@@ -381,9 +381,9 @@ tbody tr:last-child td{border-bottom:none}
     <span class="sl">ภาพรวม</span>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <div class="tabs" id="periodTabs" style="margin-bottom:0">
-        <button class="tab on" data-period="month"     onclick="setPeriod('month',this)">เดือนนี้</button>
-        <button class="tab"    data-period="today"     onclick="setPeriod('today',this)">วันนี้</button>
+        <button class="tab on" data-period="today"     onclick="setPeriod('today',this)">วันนี้</button>
         <button class="tab"    data-period="yesterday" onclick="setPeriod('yesterday',this)">เมื่อวานนี้</button>
+        <button class="tab"    data-period="month"     onclick="setPeriod('month',this)">เดือนนี้</button>
       </div>
       <span class="dbadge" id="drBadge">—</span>
     </div>
@@ -492,7 +492,7 @@ const $    = id => document.getElementById(id);
 const fmtM = n  => new Intl.NumberFormat('th-TH').format(Math.round(Math.abs(n)));
 const fmtD = n  => new Intl.NumberFormat('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Math.abs(Number(n)||0));
 
-let mainChart=null, curTab='daily', curData=null, curPeriod='month';
+let mainChart=null, curTab='daily', curData=null, curPeriod='today';
 
 /* ── RENDER ─────────────────────────────────── */
 function render(d, targetData){
