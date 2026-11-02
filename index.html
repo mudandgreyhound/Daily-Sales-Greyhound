@@ -242,6 +242,22 @@ tbody tr:last-child td{border-bottom:none}
 .footer a{color:var(--muted);text-decoration:none}
 .footer a:hover{color:var(--accent)}
 
+/* ── REALTIME (store-direct) ── */
+.rt-auto{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);cursor:pointer}
+.rt-auto input{accent-color:var(--accent)}
+.rt-dots{display:flex;flex-wrap:wrap;gap:7px}
+.rt-chip{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:600;font-family:var(--mono);
+  background:var(--glass-strong);border:1px solid var(--glass-br);box-shadow:var(--glass-sh-sm)}
+.rt-chip .d{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.rt-chip.ok .d{background:var(--green);box-shadow:0 0 7px var(--green)}
+.rt-chip.idle .d{background:var(--amber);box-shadow:0 0 7px var(--amber)}
+.rt-chip.err{opacity:.6}
+.rt-chip.err .d{background:var(--red)}
+.rt-chip .t{color:var(--muted);font-weight:400;font-size:10px}
+.rt-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:16px}
+@media(max-width:900px){.rt-grid{grid-template-columns:1fr}}
+.rt-grid h4{font-size:12px;font-weight:700;color:var(--text);margin:0 0 10px;letter-spacing:.02em}
+
 </style>
 
 <div class="overlay" id="loader">
@@ -301,6 +317,64 @@ tbody tr:last-child td{border-bottom:none}
 </nav>
 <main class="page">
   <div class="errbanner" id="errBanner"></div>
+
+  <!-- ⚡ REALTIME (store-direct) -->
+  <div class="sh" style="margin-top:4px">
+    <span class="sl">⚡ สด — Realtime (ตรงจากสาขา)</span>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <label class="rt-auto"><input type="checkbox" id="rtAuto" checked onchange="rtTimer()"> auto 30 วิ</label>
+      <span class="dbadge" id="rtUpdated">—</span>
+      <button class="btn" onclick="rtFetch()" style="padding:5px 12px;font-size:11px">⟳ สด</button>
+    </div>
+  </div>
+
+  <div class="hero" style="background:linear-gradient(135deg,rgba(21,147,90,.95),rgba(14,165,183,.9) 60%,rgba(109,94,252,.82))">
+    <div class="hero-side">
+      <div class="hero-side-val" id="rtBills">—</div>
+      <div class="hero-side-lbl">บิลวันนี้</div>
+    </div>
+    <div class="hero-center">
+      <div class="hero-label">ยอดขายสดวันนี้ — Incl. VAT</div>
+      <div class="hero-value" id="rtSales">—</div>
+      <div class="hero-sub" id="rtReport">—</div>
+    </div>
+    <div class="hero-side">
+      <div class="hero-side-val" id="rtAvg">—</div>
+      <div class="hero-side-lbl">เฉลี่ย / บิล</div>
+    </div>
+  </div>
+
+  <div class="target-card">
+    <div class="tc-head">
+      <div class="tc-title">สถานะสาขา</div>
+      <div class="tc-summary" id="rtLastPull">—</div>
+    </div>
+    <div class="rt-dots" id="rtDots"><span style="color:var(--muted);font-size:12px">กำลังโหลด...</span></div>
+  </div>
+
+  <div class="rt-grid">
+    <div class="ccard">
+      <h4>ยอดสดตามสาขา</h4>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>สาขา</th><th class="r">บิล</th><th class="r">ยอด</th><th class="r">บิลล่าสุด</th></tr></thead>
+        <tbody id="rtStoreBody"></tbody>
+      </table></div>
+    </div>
+    <div class="ccard">
+      <h4>Top สินค้า (วันนี้)</h4>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Item</th><th class="r">ชิ้น</th><th class="r">ยอด</th></tr></thead>
+        <tbody id="rtTopBody"></tbody>
+      </table></div>
+    </div>
+    <div class="ccard">
+      <h4>โปรโมชัน (วันนี้)</h4>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Promo</th><th class="r">ชิ้น</th><th class="r">ส่วนลด</th></tr></thead>
+        <tbody id="rtPromoBody"></tbody>
+      </table></div>
+    </div>
+  </div>
 
   <!-- HERO -->
   <div class="sh" style="margin-top:4px">
@@ -870,7 +944,77 @@ function loadDemo(){
   ]);
 }
 
-window.onload=()=>fetchData();
+/* ── REALTIME (store-direct) ─────────────────── */
+const RT_BASE = "https://greyhound_api.mobile1234.site/api/rt";
+let rtInterval = null;
+
+function rtEmpty(c){return `<tr><td colspan="${c}" style="text-align:center;color:var(--muted);padding:16px">—</td></tr>`;}
+
+async function rtFetch(){
+  try{
+    const [p,t,pr] = await Promise.all([
+      fetch(`${RT_BASE}/pulse`).then(r=>r.json()),
+      fetch(`${RT_BASE}/top`).then(r=>r.json()),
+      fetch(`${RT_BASE}/promotion`).then(r=>r.json())
+    ]);
+    rtRenderPulse(p);
+    rtRenderTop(t);
+    rtRenderPromo(pr);
+    $('rtUpdated').textContent = 'สด ' + (p.generated||'—');
+  }catch(e){
+    $('rtUpdated').textContent = 'ต่อ API สดไม่ได้';
+  }
+}
+
+function rtRenderPulse(p){
+  const sm = p.summary||{}, shops = p.shops||[];
+  $('rtSales').textContent = '฿' + fmtM(sm.totalSales||0);
+  $('rtBills').textContent = (sm.totalBills||0).toLocaleString('th-TH');
+  const avg = sm.totalBills ? Math.round((sm.totalSales||0)/sm.totalBills) : 0;
+  $('rtAvg').textContent = '฿' + fmtM(avg);
+  $('rtReport').textContent = `${sm.shopsReporting||0}/${sm.shopsTotal||0} สาขาส่งข้อมูล · error ${sm.shopsError||0}`;
+  $('rtLastPull').textContent = 'ดึงล่าสุด ' + (sm.lastPull||'—');
+
+  $('rtDots').innerHTML = shops.length ? shops.map(s=>{
+    const cls = s.status==='error' ? 'err' : (s.bills>0 ? 'ok' : 'idle');
+    const tail = s.status==='error' ? '✕' : (s.lastBill||'—');
+    const tip = s.status==='error' ? 'ต่อไม่ติด' : (s.lastBill ? 'บิลล่าสุด '+s.lastBill : 'ยังไม่มีบิล');
+    return `<span class="rt-chip ${cls}" title="${s.store} · ${tip}"><span class="d"></span>${s.store}<span class="t">${tail}</span></span>`;
+  }).join('') : '<span style="color:var(--muted);font-size:12px">ยังไม่มีข้อมูล</span>';
+
+  const rep = shops.filter(s=>s.bills>0);
+  $('rtStoreBody').innerHTML = rep.length ? rep.map(x=>`<tr>
+    <td class="mono" style="font-weight:600">${x.store}</td>
+    <td class="r">${x.bills}</td>
+    <td class="r mono" style="font-weight:600">฿${fmtM(x.sales)}</td>
+    <td class="r mono" style="font-size:10px;color:var(--muted)">${x.lastBill||'—'}</td>
+  </tr>`).join('') : rtEmpty(4);
+}
+
+function rtRenderTop(t){
+  const rows = (t.rows||[]).slice(0,10);
+  $('rtTopBody').innerHTML = rows.length ? rows.map(x=>`<tr>
+    <td class="mono" style="font-size:10px">${x.item}</td>
+    <td class="r">${x.qty}</td>
+    <td class="r mono">฿${fmtM(x.sales)}</td>
+  </tr>`).join('') : rtEmpty(3);
+}
+
+function rtRenderPromo(pr){
+  const rows = (pr.rows||[]).slice(0,10);
+  $('rtPromoBody').innerHTML = rows.length ? rows.map(x=>`<tr>
+    <td class="mono">${x.promotion}</td>
+    <td class="r">${x.qty}</td>
+    <td class="r mono">฿${fmtM(x.discountGiven)}</td>
+  </tr>`).join('') : rtEmpty(3);
+}
+
+function rtTimer(){
+  if(rtInterval){clearInterval(rtInterval);rtInterval=null;}
+  if($('rtAuto').checked) rtInterval = setInterval(rtFetch, 30000);
+}
+
+window.onload=()=>{fetchData();rtFetch();rtTimer();};
 </script>
 
 </body></html>
