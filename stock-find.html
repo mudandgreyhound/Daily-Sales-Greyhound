@@ -60,9 +60,11 @@ body{margin:0;font-family:var(--sans);color:var(--text);background:var(--ground)
 .shops{display:flex;flex-direction:column;gap:7px}
 .shop{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;background:var(--glass-strong);border:1px solid var(--glass-br)}
 .shop-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-.shop-code{font-family:var(--mono);font-weight:700;font-size:13px;min-width:46px}
+.shop-id{flex:1;min-width:0}
+.shop-code{font-family:var(--mono);font-weight:700;font-size:13px}
+.shop-name{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .shop-qty{font-family:var(--mono);font-weight:700;font-size:15px;min-width:40px;text-align:right}
-.sizes{display:flex;flex-wrap:wrap;gap:5px;flex:1}
+.sizes{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end;max-width:48%}
 .size{font-family:var(--mono);font-size:11px;padding:2px 9px;border-radius:14px;background:var(--acc-bg);color:var(--accent);border:1px solid var(--acc-border)}
 .empty{text-align:center;color:var(--muted);padding:40px 16px;font-size:14px}
 .spin{width:34px;height:34px;border:3px solid var(--glass-br);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;margin:30px auto}
@@ -106,6 +108,15 @@ const GROUPS = [
   {k:'shopee',c:'#db2777',s:new Set(['SPX'])},{k:'outside',c:'#8b5cf6',s:new Set(['OL01','OL02','OS04'])},
 ];
 const dotColor = st => (GROUPS.find(g=>g.s.has(st))||{c:'#9794bd'}).c;
+const STORE_NAMES = {
+  CCL:'FS10-The Circle Ratchapruk',CLD:'FS03-Central Ladprao',CLP:'CDS Central Ladprao',
+  CWD:'Central World CDS',CWV:'SmileyHound Central Westville',EML:'FS06-CentralPlaza WestGate',
+  EMQ:'Smileyhound Fashion Island',GPG:'FS04-GREYHOUND Siam Paragon',MGB:'FS12-Mega Bangna',
+  SC1:'FS01-Siam Center 1',SC2:'FS02-Smileyhound CentralWorld',SCS:'FS15 Seacon Srinakarin',
+  SHS:'FS07-Smiley hound Siam Center',SPM:'DC03-Siam paragon SMH',MEC:'Website',
+  SPX:'Shopee',TTS:'Tiktok',OL01:'OL01-Outlet Team 1',OL02:'OL02-Outlet Team 2',OS04:'OS04'
+};
+const storeName = c => STORE_NAMES[c] || '';
 
 async function search(){
   const q = $('q').value.trim();
@@ -144,7 +155,10 @@ function render(d){
         ${it.shops.map(sh=>`
           <div class="shop">
             <span class="shop-dot" style="background:${dotColor(sh.store)}"></span>
-            <span class="shop-code">${sh.store}</span>
+            <div class="shop-id">
+              <div class="shop-code">${sh.store}</div>
+              <div class="shop-name">${storeName(sh.store)}</div>
+            </div>
             <span class="shop-qty">${fmt(sh.qty)}</span>
             <span class="sizes">${sh.sizes.map(z=>`<span class="size">${z.size}·${z.qty}</span>`).join('')}</span>
           </div>`).join('')}
