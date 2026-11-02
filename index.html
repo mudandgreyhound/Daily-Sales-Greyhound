@@ -469,6 +469,16 @@ const GROUPS  = [
 ];
 function getGroup(n){for(const g of GROUPS)if(g.stores.has(n))return g;return null;}
 
+const STORE_NAMES = {
+  CCL:'FS10-The Circle Ratchapruk', CLD:'FS03-Central Ladprao', CLP:'CDS Central Ladprao',
+  CWD:'Central World CDS', CWV:'SmileyHound Central Westville', EML:'FS06-CentralPlaza WestGate',
+  EMQ:'Smileyhound Fashion Island', GPG:'FS04-GREYHOUND Siam Paragon', MGB:'FS12-Mega Bangna',
+  SC1:'FS01-Siam Center 1', SC2:'FS02-Smileyhound CentralWorld', SCS:'FS15 Seacon Srinakarin',
+  SHS:'FS07-Smiley hound Siam Center', SPM:'DC03-Siam paragon SMH', MEC:'Website',
+  SPX:'Shopee', TTS:'Tiktok', OL01:'OL01-Outlet Team 1', OL02:'OL02-Outlet Team 2', OS04:'OS04'
+};
+const storeName = c => STORE_NAMES[c] || '';
+
 const $    = id => document.getElementById(id);
 const fmtM = n  => new Intl.NumberFormat('th-TH').format(Math.round(Math.abs(n)));
 const fmtD = n  => new Intl.NumberFormat('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Math.abs(Number(n)||0));
@@ -952,12 +962,16 @@ function rtEmpty(c){return `<tr><td colspan="${c}" style="text-align:center;colo
 
 function renderDots(items){
   $('statusDots').innerHTML = items.length ? items.map(s=>
-    `<span class="rt-chip ${s.state}" title="${s.tip}"><span class="d"></span>${s.store}<span class="t">${s.tail}</span></span>`
+    `<span class="rt-chip ${s.state}" title="${storeName(s.store)?storeName(s.store)+' — ':''}${s.tip}"><span class="d"></span>${s.store}<span class="t">${s.tail}</span></span>`
   ).join('') : '<span style="color:var(--muted);font-size:12px">ยังไม่มีข้อมูล</span>';
 }
 function storeRow(store,bills,sales,last){
+  const nm = storeName(store);
   return `<tr>
-    <td class="mono" style="font-weight:600">${store}</td>
+    <td>
+      <div class="mono" style="font-weight:600">${store}</div>
+      ${nm?`<div style="font-size:9px;color:var(--muted);line-height:1.25">${nm}</div>`:''}
+    </td>
     <td class="r">${bills}</td>
     <td class="r mono" style="font-weight:600">฿${fmtM(sales)}</td>
     <td class="r mono" style="font-size:10px;color:var(--muted)">${last||'—'}</td>
