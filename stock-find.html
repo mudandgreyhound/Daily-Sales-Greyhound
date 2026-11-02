@@ -100,6 +100,7 @@ body{margin:0;font-family:var(--sans);color:var(--text);background:var(--ground)
 
 <script>
 const API = "https://greyhound_api.mobile1234.site/api/stock/find";
+let _seq = 0, _t = null;
 const $ = id => document.getElementById(id);
 const fmt = n => new Intl.NumberFormat('th-TH').format(Math.round(Math.abs(n)));
 const GROUPS = [
@@ -120,13 +121,16 @@ const storeName = c => STORE_NAMES[c] || '';
 
 async function search(){
   const q = $('q').value.trim();
-  if(q.length < 2){ $('hint').textContent='พิมพ์อย่างน้อย 2 ตัวอักษร'; return; }
-  $('results').innerHTML = '<div class="spin"></div>';
+  if(q.length < 2){ $('results').innerHTML=''; $('hint').textContent='พิมพ์อย่างน้อย 2 ตัวอักษร'; return; }
+  const my = ++_seq;
+  if(!$('results').innerHTML) $('results').innerHTML = '<div class="spin"></div>';
   $('hint').textContent = `กำลังค้นหา "${q}"...`;
   try{
     const d = await fetch(`${API}?q=${encodeURIComponent(q)}`).then(r=>r.json());
+    if(my !== _seq) return;              // ผลเก่ามาช้า ทิ้งไป
     render(d);
   }catch(e){
+    if(my !== _seq) return;
     $('results').innerHTML = `<div class="empty">ต่อ API ไม่ได้: ${e.message}</div>`;
     $('hint').textContent = '';
   }
@@ -166,6 +170,8 @@ function render(d){
     </div>`).join('');
 }
 
-$('q').addEventListener('keydown', e=>{ if(e.key==='Enter') search(); });
+// ค้นหาสดขณะพิมพ์ (debounce 300ms)
+$('q').addEventListener('input', ()=>{ clearTimeout(_t); _t = setTimeout(search, 300); });
+$('q').addEventListener('keydown', e=>{ if(e.key==='Enter'){ clearTimeout(_t); search(); } });
 </script>
 </body></html>
