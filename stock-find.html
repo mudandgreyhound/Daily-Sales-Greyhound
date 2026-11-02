@@ -63,6 +63,7 @@ body{margin:0;font-family:var(--sans);color:var(--text);background:var(--ground)
 .shop-id{flex:1;min-width:0}
 .shop-code{font-family:var(--mono);font-weight:700;font-size:13px}
 .shop-name{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.live-tag{font-family:var(--sans);font-size:9px;font-weight:700;color:var(--green);background:rgba(21,197,118,.15);padding:1px 6px;border-radius:10px;margin-left:6px;vertical-align:middle}
 .shop-qty{font-family:var(--mono);font-weight:700;font-size:15px;min-width:40px;text-align:right}
 .sizes{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end;max-width:48%}
 .size{font-family:var(--mono);font-size:11px;padding:2px 9px;border-radius:14px;background:var(--acc-bg);color:var(--accent);border:1px solid var(--acc-border)}
@@ -160,7 +161,7 @@ function render(d){
           <div class="shop">
             <span class="shop-dot" style="background:${dotColor(sh.store)}"></span>
             <div class="shop-id">
-              <div class="shop-code">${sh.store}</div>
+              <div class="shop-code">${sh.store}${sh.fresh?'<span class="live-tag">สด</span>':''}</div>
               <div class="shop-name">${storeName(sh.store)}</div>
             </div>
             <span class="shop-qty">${fmt(sh.qty)}</span>
