@@ -1,0 +1,876 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Greyhound Original Sales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+/* Layout: frosted-glass cards floating over an aurora gradient; sticky frosted topbar; stacks to one column on phone */
+:root{
+  /* neutrals / text (indigo-biased) */
+  --text:#201c42; --text2:#4b4674; --muted:#6f6b96; --muted2:#9794bd;
+  /* accent */
+  --accent:#6d5efc; --acc-lt:#9b8cff; --acc-bg:rgba(109,94,252,.13); --acc-border:rgba(109,94,252,.3);
+  /* glass surfaces */
+  --glass:rgba(255,255,255,.52); --glass2:rgba(255,255,255,.4); --glass-strong:rgba(255,255,255,.72);
+  --card:var(--glass); --card2:rgba(255,255,255,.46); --surf:rgba(255,255,255,.6);
+  --border:rgba(255,255,255,.6); --border2:rgba(120,110,180,.28);
+  --glass-br:rgba(255,255,255,.68); --glass-sh:0 10px 34px -10px rgba(55,40,120,.32);
+  --glass-sh-sm:0 5px 18px -8px rgba(55,40,120,.26);
+  --line:rgba(120,110,180,.16);
+  /* status */
+  --green:#15935a; --green-bg:rgba(21,197,118,.15); --red:#e0405b; --red-bg:rgba(224,64,91,.13);
+  --amber:#c8780f; --amber-bg:rgba(217,131,19,.16);
+  /* chart ink */
+  --chart-tick:#7b77a3; --chart-label:#2e2a52; --chart-grid:rgba(120,110,180,.14);
+  /* channel colours */
+  --c-shop:#6d5efc; --c-online:#0ea5b7; --c-tiktok:#e8912a; --c-outside:#8b5cf6;
+  /* aurora ground */
+  --ground:
+    radial-gradient(1100px 680px at 6% -10%, rgba(129,140,248,.55), transparent 60%),
+    radial-gradient(920px 640px at 102% -2%, rgba(236,72,153,.30), transparent 58%),
+    radial-gradient(1000px 760px at 72% 112%, rgba(34,211,238,.32), transparent 60%),
+    radial-gradient(900px 640px at -6% 110%, rgba(167,139,250,.40), transparent 60%),
+    linear-gradient(160deg,#eef1fe 0%,#f6f0fb 55%,#eaf4fe 100%);
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --sans:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;
+  --r:18px; --r-sm:12px;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --text:#edefff; --text2:#c7c9ef; --muted:#9a9ccb; --muted2:#74769e;
+  --accent:#a78bff; --acc-lt:#c4b5fd; --acc-bg:rgba(167,139,255,.16); --acc-border:rgba(167,139,255,.34);
+  --glass:rgba(255,255,255,.065); --glass2:rgba(255,255,255,.045); --glass-strong:rgba(255,255,255,.1);
+  --card:var(--glass); --card2:rgba(255,255,255,.05); --surf:rgba(255,255,255,.07);
+  --border:rgba(255,255,255,.14); --border2:rgba(255,255,255,.12);
+  --glass-br:rgba(255,255,255,.14); --glass-sh:0 14px 44px -12px rgba(0,0,0,.6);
+  --glass-sh-sm:0 8px 22px -10px rgba(0,0,0,.55);
+  --line:rgba(255,255,255,.09);
+  --green:#34d58a; --green-bg:rgba(52,213,138,.16); --red:#ff6b82; --red-bg:rgba(255,107,130,.15);
+  --amber:#f0a33c; --amber-bg:rgba(240,163,60,.16);
+  --chart-tick:#9a9ccb; --chart-label:#d8daf5; --chart-grid:rgba(255,255,255,.08);
+  --ground:
+    radial-gradient(1100px 680px at 6% -12%, rgba(99,102,241,.42), transparent 60%),
+    radial-gradient(920px 640px at 102% -4%, rgba(190,38,120,.34), transparent 58%),
+    radial-gradient(1000px 760px at 74% 112%, rgba(14,165,183,.30), transparent 60%),
+    radial-gradient(900px 640px at -8% 110%, rgba(124,58,237,.40), transparent 60%),
+    linear-gradient(160deg,#0b0920 0%,#120f2e 55%,#0a1226 100%);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --text:#edefff; --text2:#c7c9ef; --muted:#9a9ccb; --muted2:#74769e;
+  --accent:#a78bff; --acc-lt:#c4b5fd; --acc-bg:rgba(167,139,255,.16); --acc-border:rgba(167,139,255,.34);
+  --glass:rgba(255,255,255,.065); --glass2:rgba(255,255,255,.045); --glass-strong:rgba(255,255,255,.1);
+  --card:var(--glass); --card2:rgba(255,255,255,.05); --surf:rgba(255,255,255,.07);
+  --border:rgba(255,255,255,.14); --border2:rgba(255,255,255,.12);
+  --glass-br:rgba(255,255,255,.14); --glass-sh:0 14px 44px -12px rgba(0,0,0,.6);
+  --glass-sh-sm:0 8px 22px -10px rgba(0,0,0,.55);
+  --line:rgba(255,255,255,.09);
+  --green:#34d58a; --green-bg:rgba(52,213,138,.16); --red:#ff6b82; --red-bg:rgba(255,107,130,.15);
+  --amber:#f0a33c; --amber-bg:rgba(240,163,60,.16);
+  --chart-tick:#9a9ccb; --chart-label:#d8daf5; --chart-grid:rgba(255,255,255,.08);
+  --ground:
+    radial-gradient(1100px 680px at 6% -12%, rgba(99,102,241,.42), transparent 60%),
+    radial-gradient(920px 640px at 102% -4%, rgba(190,38,120,.34), transparent 58%),
+    radial-gradient(1000px 760px at 74% 112%, rgba(14,165,183,.30), transparent 60%),
+    radial-gradient(900px 640px at -8% 110%, rgba(124,58,237,.40), transparent 60%),
+    linear-gradient(160deg,#0b0920 0%,#120f2e 55%,#0a1226 100%);
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{
+  font-family:var(--sans); color:var(--text);
+  background:var(--ground) fixed; background-attachment:fixed;
+  min-height:100vh; font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+/* top safe-area band */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--glass-strong);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* glass helper */
+.glass{background:var(--glass);backdrop-filter:blur(20px) saturate(155%);-webkit-backdrop-filter:blur(20px) saturate(155%);border:1px solid var(--glass-br);box-shadow:var(--glass-sh)}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:50;
+  display:flex; align-items:center; justify-content:space-between; gap:12px; height:58px;
+  padding-inline:max(18px,env(safe-area-inset-left,0px)) max(18px,env(safe-area-inset-right,0px));
+  background:var(--glass-strong); backdrop-filter:blur(22px) saturate(160%); -webkit-backdrop-filter:blur(22px) saturate(160%);
+  border-bottom:1px solid var(--glass-br);
+}
+.tb-left{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:36px;height:36px;flex-shrink:0;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;
+  background:linear-gradient(135deg,var(--accent),var(--acc-lt));box-shadow:0 4px 14px -2px rgba(109,94,252,.6),inset 0 1px 0 rgba(255,255,255,.4)}
+.tb-brand{display:flex;flex-direction:column;gap:1px;min-width:0}
+.tb-title{font-size:13.5px;font-weight:700;letter-spacing:-.01em}
+.tb-sub{font-size:11px;color:var(--muted)}
+.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.status-pill{display:flex;align-items:center;gap:6px;border-radius:20px;padding:4px 11px 4px 9px;font-size:11px;color:var(--text2);
+  background:var(--glass);border:1px solid var(--glass-br)}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--muted2);flex-shrink:0}
+.sdot.live{background:var(--green);box-shadow:0 0 0 3px var(--green-bg);animation:pulse 2s infinite}
+.sdot.err{background:var(--red);box-shadow:0 0 0 3px var(--red-bg)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+.btn{border:none;border-radius:10px;padding:7px 15px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);white-space:nowrap;color:#fff;
+  background:linear-gradient(135deg,var(--accent),var(--acc-lt));box-shadow:0 4px 14px -3px rgba(109,94,252,.55),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .12s,box-shadow .15s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 7px 20px -4px rgba(109,94,252,.6),inset 0 1px 0 rgba(255,255,255,.4)}
+.btn-outline{border:1px solid var(--glass-br);border-radius:10px;padding:7px 15px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);white-space:nowrap;
+  color:var(--text2);background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:all .15s}
+.btn-outline:hover{color:var(--accent);border-color:var(--acc-border);background:var(--acc-bg)}
+.btn-success{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;border:none;border-radius:10px;padding:8px 15px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);box-shadow:0 4px 14px -3px rgba(22,163,74,.5)}
+.btn-success:hover{filter:brightness(1.05)}
+
+/* ── NAV ── */
+.navtabs{display:flex;gap:4px;padding-inline:max(18px,env(safe-area-inset-left,0px)) max(18px,env(safe-area-inset-right,0px));
+  background:var(--glass2);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.navtab{padding:12px 18px;font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;border-bottom:2px solid transparent;transition:color .15s}
+.navtab:hover{color:var(--text)}
+.navtab.on{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── PAGE ── */
+.page{max-width:1440px;margin:0 auto;
+  padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));
+  padding-block:22px 64px;display:flex;flex-direction:column;gap:16px}
+
+/* section header */
+.sh{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:-4px}
+.sl{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.dbadge{font-family:var(--mono);font-size:11px;color:var(--text2);background:var(--glass);border:1px solid var(--glass-br);padding:3px 11px;border-radius:20px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+
+/* ── HERO ── */
+.hero{position:relative;overflow:hidden;border-radius:var(--r);padding:30px 34px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+  background:linear-gradient(135deg,rgba(109,94,252,.95),rgba(139,92,246,.88) 45%,rgba(14,165,183,.82));
+  border:1px solid rgba(255,255,255,.28);box-shadow:0 18px 48px -14px rgba(76,52,170,.55),inset 0 1px 0 rgba(255,255,255,.35);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.hero::before{content:'';position:absolute;top:-50px;right:-30px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.14);filter:blur(6px)}
+.hero::after{content:'';position:absolute;bottom:-70px;right:150px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.08)}
+.hero-center{text-align:center;flex:1;position:relative;z-index:1;min-width:220px}
+.hero-label{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.78);margin-bottom:8px}
+.hero-value{font-family:var(--mono);font-size:clamp(38px,8vw,56px);font-weight:700;color:#fff;letter-spacing:-2px;line-height:1;text-shadow:0 3px 18px rgba(0,0,0,.22);font-variant-numeric:tabular-nums}
+.hero-sub{font-size:12px;color:rgba(255,255,255,.7);margin-top:7px}
+.hero-side{text-align:center;flex:0 0 150px;position:relative;z-index:1}
+.hero-side-val{font-family:var(--mono);font-size:28px;font-weight:700;color:#fff;line-height:1.1;font-variant-numeric:tabular-nums}
+.hero-side-lbl{font-size:11px;color:rgba(255,255,255,.72);margin-top:4px}
+
+/* ── TARGET CARD ── */
+.target-card{border-radius:var(--r);padding:22px 26px;background:var(--glass);border:1px solid var(--glass-br);box-shadow:var(--glass-sh);
+  backdrop-filter:blur(20px) saturate(155%);-webkit-backdrop-filter:blur(20px) saturate(155%)}
+.tc-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.tc-title{font-size:13.5px;font-weight:700;color:var(--text)}
+.tc-summary{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.big-bar-bg{height:9px;background:var(--line);border-radius:5px;overflow:hidden;margin-bottom:6px}
+.big-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent),var(--acc-lt));transition:width 1.2s cubic-bezier(.4,0,.2,1);box-shadow:0 0 12px rgba(109,94,252,.5)}
+.big-bar-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:18px}
+
+.grp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+@media(max-width:1100px){.grp-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:720px){.grp-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:460px){.grp-grid{grid-template-columns:1fr}}
+.grp-card{border-radius:var(--r-sm);padding:15px 16px;min-width:0;background:var(--glass-strong);border:1px solid var(--glass-br);box-shadow:var(--glass-sh-sm);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:transform .18s,box-shadow .18s}
+.grp-card:hover{transform:translateY(-2px);box-shadow:var(--glass-sh)}
+.gc-hd{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:9px}
+.gc-name{font-size:12px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:6px;min-width:0}
+.gc-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px currentColor}
+.gc-pct{font-size:10px;padding:2px 9px;border-radius:20px;font-weight:700;font-family:var(--mono)}
+.gc-val{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--text);margin-bottom:9px;font-variant-numeric:tabular-nums}
+.gc-bar-bg{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:7px}
+.gc-bar-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.gc-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+
+/* ── CHART CARD ── */
+.ccard{border-radius:var(--r);padding:18px 22px;background:var(--glass);border:1px solid var(--glass-br);box-shadow:var(--glass-sh);
+  backdrop-filter:blur(20px) saturate(155%);-webkit-backdrop-filter:blur(20px) saturate(155%)}
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tab{font-size:12px;font-weight:600;padding:6px 15px;border-radius:20px;border:1px solid var(--glass-br);background:var(--glass2);color:var(--muted);cursor:pointer;font-family:var(--sans);transition:all .15s;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.tab:hover{color:var(--text)}
+.tab.on{background:var(--acc-bg);border-color:var(--acc-border);color:var(--accent)}
+.leg{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.lsq{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+
+/* ── TABLE ── */
+.tcard{border-radius:var(--r);overflow-x:auto;background:var(--glass);border:1px solid var(--glass-br);box-shadow:var(--glass-sh);
+  backdrop-filter:blur(20px) saturate(155%);-webkit-backdrop-filter:blur(20px) saturate(155%)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{text-align:left;padding:10px 12px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);white-space:nowrap;
+  border-bottom:1px solid var(--glass-br);background:var(--glass2);position:sticky;top:0;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+th.r,td.r{text-align:right;font-variant-numeric:tabular-nums}
+tbody td{padding:8px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--text2)}
+tbody tr{transition:background .12s}
+tbody tr:hover{background:var(--acc-bg)}
+tbody tr:last-child td{border-bottom:none}
+.day-hdr td{background:var(--acc-bg)!important;border-top:1px solid var(--acc-border)!important;border-bottom:1px solid var(--acc-border)!important;padding:8px 12px!important;font-weight:700;color:var(--accent)}
+.detail-row td{color:var(--muted);padding:5px 12px!important;font-size:11px}
+.mono{font-family:var(--mono)}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;z-index:300;align-items:center;justify-content:center;background:rgba(20,15,45,.4);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.modal-bg.show{display:flex}
+.modal{width:420px;max-width:calc(100vw - 32px);border-radius:22px;padding:28px;
+  background:var(--glass-strong);border:1px solid var(--glass-br);box-shadow:0 24px 64px -16px rgba(30,20,70,.5);
+  backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%)}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:18px;color:var(--text)}
+.form-row{margin-bottom:14px}
+.form-label{font-size:11px;color:var(--muted);margin-bottom:5px;display:block;font-weight:600}
+.form-input{width:100%;border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:13px;padding:9px 12px;outline:none;font-family:var(--mono);
+  background:var(--glass2);transition:border-color .15s,box-shadow .15s}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--acc-bg)}
+.modal-btns{display:flex;gap:8px;margin-top:20px;justify-content:flex-end;flex-wrap:wrap}
+.cb-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);margin-bottom:9px}
+.cb-row input{accent-color:var(--accent)}
+.store-cb{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer}
+.store-cb input{accent-color:var(--accent);width:13px;height:13px;cursor:pointer}
+
+/* ── OVERLAY ── */
+.overlay{display:none;position:fixed;inset:0;z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:rgba(240,243,252,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.overlay.show{display:flex}
+.spin{width:38px;height:38px;border:3px solid var(--glass-br);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.spin-lbl{font-size:12px;color:var(--text2);font-weight:600}
+
+.errbanner{display:none;background:var(--red-bg);border:1px solid var(--red);border-radius:12px;padding:10px 14px;font-size:12px;color:var(--red)}
+.errbanner.show{display:block}
+.footer{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--muted)}
+.footer a{color:var(--muted);text-decoration:none}
+.footer a:hover{color:var(--accent)}
+
+</style>
+
+<div class="overlay" id="loader">
+  <div class="spin"></div>
+  <div class="spin-lbl">กำลังดึงข้อมูล...</div>
+</div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-bg" id="exportModal">
+  <div class="modal">
+    <div class="modal-title">⬇ Export ข้อมูล</div>
+    <div class="form-row"><label class="form-label">วันที่เริ่มต้น</label><input class="form-input" type="date" id="expFrom"></div>
+    <div class="form-row"><label class="form-label">วันที่สิ้นสุด</label><input class="form-input" type="date" id="expTo"></div>
+    <div class="form-row">
+      <label class="form-label">สาขา (ไม่เลือก = ทุกสาขา)</label>
+      <div style="display:flex;gap:8px;margin-bottom:6px">
+        <button onclick="selectAllStores(true)"  style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--card2);cursor:pointer">เลือกทั้งหมด</button>
+        <button onclick="selectAllStores(false)" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--card2);cursor:pointer">ล้างทั้งหมด</button>
+      </div>
+      <div id="storeCheckboxes" style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px 10px;max-height:160px;overflow-y:auto;background:var(--card2);border:1px solid var(--border2);border-radius:8px;padding:10px;font-size:12px"></div>
+    </div>
+    <div style="margin-bottom:10px;font-size:11px;color:var(--muted);font-weight:500">เลือกข้อมูลที่ต้องการ</div>
+    <div class="cb-row"><input type="checkbox" id="cb-summary" checked> สรุปรายวัน</div>
+    <div class="cb-row"><input type="checkbox" id="cb-store"   checked> ยอดขายตามสาขา</div>
+    <div class="cb-row"><input type="checkbox" id="cb-detail"  checked> รายละเอียดรายการ</div>
+    <div class="modal-btns">
+      <button class="btn-outline" onclick="closeExport()">ยกเลิก</button>
+      <button class="btn-success" onclick="doExportCSV()">CSV</button>
+      <button class="btn"         onclick="doExportExcel()">Excel</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="tb-left">
+    <div class="logo">GH</div>
+    <div class="tb-brand">
+      <div class="tb-title">Greyhound Original · Sales Dashboard</div>
+      <div class="tb-sub" id="drSub">—</div>
+    </div>
+  </div>
+  <div class="tb-right">
+    <div class="status-pill">
+      <span class="sdot" id="sdot"></span>
+      <span id="stxt">ยังไม่ได้โหลด</span>
+    </div>
+    <button class="btn-outline" onclick="openExport()">⬇ Export</button>
+    <button class="btn"         onclick="fetchData()">⟳ รีเฟรช</button>
+    <button class="btn-outline" onclick="loadDemo()">Demo</button>
+  </div>
+</header>
+
+<nav class="navtabs">
+  <a href="index.html" class="navtab on">📊 ยอดขาย</a>
+  <a href="stock.html" class="navtab">📦 สต๊อกสินค้า</a>
+</nav>
+<main class="page">
+  <div class="errbanner" id="errBanner"></div>
+
+  <!-- HERO -->
+  <div class="sh" style="margin-top:4px">
+    <span class="sl">ภาพรวม</span>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div class="tabs" id="periodTabs" style="margin-bottom:0">
+        <button class="tab on" data-period="month"     onclick="setPeriod('month',this)">เดือนนี้</button>
+        <button class="tab"    data-period="today"     onclick="setPeriod('today',this)">วันนี้</button>
+        <button class="tab"    data-period="yesterday" onclick="setPeriod('yesterday',this)">เมื่อวานนี้</button>
+      </div>
+      <span class="dbadge" id="drBadge">—</span>
+    </div>
+  </div>
+  <div class="hero">
+    <div class="hero-side">
+      <div class="hero-side-val" id="hOrders">—</div>
+      <div class="hero-side-lbl">จำนวนออเดอร์</div>
+    </div>
+    <div class="hero-center">
+      <div class="hero-label">ยอดขาย — Net Amount</div>
+      <div class="hero-value" id="heroNet">—</div>
+      <div class="hero-sub" id="heroSub">—</div>
+      <div style="margin-top:8px;font-size:15px;font-weight:600;color:rgba(255,255,255,.85);font-family:'JetBrains Mono',monospace" id="heroGross">—</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:2px;letter-spacing:.05em;text-transform:uppercase">Gross Amount (Inc. VAT)</div>
+    </div>
+    <div class="hero-side">
+      <div class="hero-side-val" id="hAvg">—</div>
+      <div class="hero-side-lbl">เฉลี่ย / ออเดอร์</div>
+    </div>
+  </div>
+
+  <!-- SALES TARGET -->
+  <div class="sh">
+    <span class="sl">Sales Target</span>
+    <span class="dbadge" id="tgtBadge">—</span>
+  </div>
+  <div class="target-card">
+    <div class="tc-head">
+      <div class="tc-title">เป้าหมายรวมเดือนนี้ — ฿18,000,000</div>
+      <div class="tc-summary" id="tcSummary">—</div>
+    </div>
+    <div class="big-bar-bg"><div class="big-bar-fill" id="bigBar" style="width:0%"></div></div>
+    <div class="big-bar-meta"><span id="bigBarPct" style="font-family:var(--mono);font-weight:600;color:var(--accent)">0%</span><span>Sales Target ฿18,000,000</span></div>
+    <div class="grp-grid" id="groupCards"></div>
+  </div>
+
+  <!-- CHART -->
+  <div class="sh">
+    <span class="sl">กราฟยอดขาย</span>
+    <span class="dbadge" id="chartBadge">—</span>
+  </div>
+  <div class="ccard" style="margin-bottom:16px">
+    <div class="tabs">
+      <button class="tab on" onclick="switchTab('daily',this)">รายวัน</button>
+      <button class="tab"    onclick="switchTab('store',this)">ตามสาขา</button>
+    </div>
+    <div style="position:relative;width:100%;height:300px" id="mwrap">
+      <canvas id="mc" role="img" aria-label="กราฟยอดขาย"></canvas>
+    </div>
+    <div class="leg" id="mleg"></div>
+  </div>
+
+  <!-- DETAIL TABLE -->
+  <div class="sh">
+    <span class="sl">ยอดขายตามสาขา — รายวัน</span>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:11px;color:var(--muted)">วันที่:</span>
+      <input type="date" id="detailDateFrom" class="form-input" style="width:auto;padding:4px 10px;font-size:12px" onchange="fetchDetail()">
+      <span style="font-size:11px;color:var(--muted)">ถึง</span>
+      <input type="date" id="detailDateTo"   class="form-input" style="width:auto;padding:4px 10px;font-size:12px" onchange="fetchDetail()">
+      <button class="btn" onclick="fetchDetail()" style="padding:5px 14px;font-size:11px">ดูข้อมูล</button>
+      <span class="dbadge" id="stBadge">—</span>
+    </div>
+  </div>
+  <div class="tcard">
+    <table>
+      <thead>
+        <tr>
+          <th>Store No_</th><th>Receipt No_</th><th>Item No_</th>
+          <th>Variant</th><th class="r">Price</th><th class="r">Qty</th>
+          <th class="r">Net Amount</th><th class="r">VAT Amount</th>
+          <th class="r">Gross Amount</th>
+          <th>Date</th><th>Time</th>
+          <th>Category</th><th>Group</th><th>Sales Staff</th>
+        </tr>
+      </thead>
+      <tbody id="detailBody"></tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    <span>Greyhound Original · Sales Dashboard · <a href="https://github.com/GREYHOUND1980/Daily-Sales-Greyhound" target="_blank">GitHub</a></span>
+    <span id="genTime">—</span>
+  </div>
+</main>
+
+<script>
+Chart.register(ChartDataLabels);
+
+// 🔧 public API ผ่าน Cloudflare tunnel: greyhound_api.mobile1234.site → localhost:9004
+const API     = "https://greyhound_api.mobile1234.site/api/sales";
+const API_DET = "https://greyhound_api.mobile1234.site/api/detail";
+
+const TARGETS = {shop:9000000,website:1000000,tiktok:2000000,shopee:2000000,outside:3000000,total:18000000};
+const GROUPS  = [
+  {key:'shop',    name:'Shop',         color:'#4f46e5', bg:'#eef2ff', stores:new Set(['CLD','SC1','GCW','MGB','SHS','SC2','SPM','GPG','SCS','EML','CWV','EMQ','PS1','CCL','MDP','PS4','SCP','PS7','PS2','PS3','CLP','CWD'])},
+  {key:'website', name:'Website',      color:'#0891b2', bg:'#ecfeff', stores:new Set(['MEC'])},
+  {key:'tiktok',  name:'TikTok',       color:'#d97706', bg:'#fffbeb', stores:new Set(['TTS'])},
+  {key:'shopee',  name:'Shopee',       color:'#db2777', bg:'#fdf2f8', stores:new Set(['SPX'])},
+  {key:'outside', name:'Outside Sales',color:'#7c3aed', bg:'#f5f3ff', stores:new Set(['OL01','OL02','OS04'])},
+];
+function getGroup(n){for(const g of GROUPS)if(g.stores.has(n))return g;return null;}
+
+const $    = id => document.getElementById(id);
+const fmtM = n  => new Intl.NumberFormat('th-TH').format(Math.round(Math.abs(n)));
+const fmtD = n  => new Intl.NumberFormat('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Math.abs(Number(n)||0));
+
+let mainChart=null, curTab='daily', curData=null, curPeriod='month';
+
+/* ── RENDER ─────────────────────────────────── */
+function render(d, targetData){
+  curData = d;
+  const dr = d.dateRange||'—';
+  ['drSub','drBadge','chartBadge'].forEach(id=>$(id).textContent=dr);
+  $('genTime').textContent = 'อัปเดต '+(d.generated||'—');
+  const net = d.net||0;
+  animTo('heroNet', 0, net,              v=>'฿'+fmtM(Math.round(v)));
+  animTo('hOrders', 0, d.orders||0,      v=>Math.round(v).toLocaleString('th-TH'));
+  animTo('hAvg',    0, d.avgPerOrder||0, v=>'฿'+fmtM(Math.round(v)));
+  $('heroSub').textContent = `${(d.orders||0).toLocaleString('th-TH')} ออเดอร์`;
+  $('heroGross').textContent = '฿' + fmtM(d.gross||0);
+  const t = targetData || d;
+  $('tgtBadge').textContent = t.dateRange||'—';
+  buildTarget(t.storeList||[]);
+  buildMain(d);
+}
+
+function animTo(id,from,to,fn,dur=900){
+  const el=$(id),t0=performance.now();
+  const go=now=>{const p=Math.min((now-t0)/dur,1),e=1-Math.pow(1-p,3);el.textContent=fn(from+(to-from)*e);if(p<1)requestAnimationFrame(go);};
+  requestAnimationFrame(go);
+}
+
+/* ── TARGET ─────────────────────────────────── */
+function buildTarget(list){
+  const tot={};GROUPS.forEach(g=>tot[g.key]=0);
+  let grand=0;
+  list.forEach(s=>{const g=getGroup(s.name);if(g)tot[g.key]+=s.rev;grand+=s.rev;});
+  const pct=Math.min(grand/TARGETS.total*100,100).toFixed(1);
+  $('bigBar').style.width=pct+'%';
+  $('bigBarPct').textContent=pct+'%';
+  $('tcSummary').textContent='฿'+fmtM(grand)+' / ฿'+fmtM(TARGETS.total)+' ('+pct+'%)';
+  const c=$('groupCards');c.innerHTML='';
+  GROUPS.forEach(g=>{
+    const rev=tot[g.key],tgt=TARGETS[g.key];
+    const p2=Math.min(rev/tgt*100,100).toFixed(1),pn=parseFloat(p2);
+    const pctColor = pn>=100?'#16a34a':pn>=50?'#d97706':'#dc2626';
+    const pctBg    = pn>=100?'#f0fdf4':pn>=50?'#fffbeb':'#fef2f2';
+    const rem=tgt-rev;
+    const div=document.createElement('div');div.className='grp-card';
+    div.innerHTML=`
+      <div class="gc-hd">
+        <div class="gc-name"><div class="gc-dot" style="background:${g.color}"></div>${g.name}</div>
+        <span class="gc-pct" style="background:${pctBg};color:${pctColor}">${p2}%</span>
+      </div>
+      <div class="gc-val">฿${fmtM(rev)}</div>
+      <div class="gc-bar-bg"><div class="gc-bar-fill" style="width:${p2}%;background:${g.color}"></div></div>
+      <div class="gc-meta">
+        <span>Target ฿${fmtM(tgt)}</span>
+        <span style="color:${rem>0?'#dc2626':'#16a34a'};font-weight:600">${rem>0?'−':''}฿${fmtM(Math.abs(rem))}</span>
+      </div>`;
+    c.appendChild(div);
+  });
+}
+
+/* ── CHART ───────────────────────────────────── */
+function buildMain(d){
+  const _cs=getComputedStyle(document.body);
+  const C_TICK=_cs.getPropertyValue('--chart-tick').trim()||'#7b77a3';
+  const C_LABEL=_cs.getPropertyValue('--chart-label').trim()||'#2e2a52';
+  const C_GRID=_cs.getPropertyValue('--chart-grid').trim()||'rgba(120,110,180,.14)';
+  if(mainChart){mainChart.destroy();mainChart=null;}
+  $('mleg').innerHTML='';
+  const dailyTarget=TARGETS.total/31;
+
+  if(curTab==='daily'){
+    $('mwrap').style.height='300px';
+    $('mleg').innerHTML=mkLeg([['#4f46e5','ยอดขาย (Net)'],['#d97706','ออเดอร์'],['#dc2626','Target/วัน']]);
+    mainChart=new Chart($('mc'),{
+      type:'bar',
+      data:{labels:d.daily.labels,datasets:[
+        {label:'ยอดขาย',data:d.daily.revenue,backgroundColor:'rgba(79,70,229,.75)',borderRadius:6,borderSkipped:'bottom',yAxisID:'y',
+         datalabels:{anchor:'end',align:'end',color:C_LABEL,font:{size:9,family:"'JetBrains Mono',monospace"},formatter:v=>'฿'+fmtM(v)}},
+        {label:'ออเดอร์',data:d.daily.receipts,type:'line',borderColor:'#d97706',pointBackgroundColor:'#d97706',pointRadius:4,borderWidth:2,backgroundColor:'transparent',yAxisID:'y2',datalabels:{display:false}},
+        {label:'Target',data:d.daily.labels.map(()=>Math.round(dailyTarget)),type:'line',borderColor:'#dc2626',borderDash:[5,4],borderWidth:1.5,pointRadius:0,backgroundColor:'transparent',yAxisID:'y',datalabels:{display:false}}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:30}},
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{if(c.datasetIndex===1)return c.parsed.y+' ออเดอร์';if(c.datasetIndex===2)return 'Target ฿'+fmtM(c.parsed.y);return '฿'+fmtM(c.parsed.y);}}},datalabels:{}},
+        scales:{
+          x:{ticks:{color:C_TICK,font:{size:10}},grid:{display:false},border:{display:false}},
+          y:{ticks:{color:C_TICK,font:{size:10},callback:v=>'฿'+fmtM(v)},grid:{color:C_GRID},border:{display:false}},
+          y2:{position:'right',ticks:{color:'#d97706',font:{size:10}},grid:{display:false},border:{display:false}}
+        }
+      }
+    });
+  } else {
+    const n=(d.storeList||[]).length;
+    $('mwrap').style.height=Math.max(320,n*32+60)+'px';
+    $('mleg').innerHTML=mkLeg([['','ยอดขายตามสาขา (สีตามกลุ่ม)']]);
+    const bgC=(d.storeList||[]).map(s=>{const g=getGroup(s.name);return g?g.color+'bb':'#94a3b8bb';});
+    mainChart=new Chart($('mc'),{
+      type:'bar',
+      data:{labels:(d.storeList||[]).map(s=>s.name),datasets:[{data:(d.storeList||[]).map(s=>s.rev),backgroundColor:bgC,borderRadius:5,borderSkipped:'right',
+        datalabels:{anchor:'end',align:'end',color:C_LABEL,font:{size:9,family:"'JetBrains Mono',monospace"},formatter:v=>'฿'+fmtM(v)}}]},
+      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,layout:{padding:{right:110}},
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'฿'+fmtM(c.parsed.x)}},datalabels:{}},
+        scales:{x:{ticks:{color:C_TICK,font:{size:10},callback:v=>'฿'+fmtM(v)},grid:{color:C_GRID},border:{display:false}},y:{ticks:{color:C_LABEL,font:{size:11}},grid:{display:false}}}
+      }
+    });
+  }
+}
+
+function mkLeg(items){return items.map(([c,l])=>`<div class="li">${c?`<span class="lsq" style="background:${c}"></span>`:''}<span>${l}</span></div>`).join('');}
+
+/* ── DETAIL TABLE ────────────────────────────── */
+function buildDetailTable(rows){
+  const body=$('detailBody');
+  body.innerHTML='';
+  if(!rows||rows.length===0){
+    body.innerHTML='<tr><td colspan="13" style="text-align:center;color:var(--muted);padding:24px">ไม่มีข้อมูล</td></tr>';
+    return;
+  }
+  const byDate={};
+  rows.forEach(r=>{
+    const dk=r.date||'—';
+    if(!byDate[dk]) byDate[dk]={};
+    if(!byDate[dk][r.store]) byDate[dk][r.store]={};
+    if(!byDate[dk][r.store][r.receipt]) byDate[dk][r.store][r.receipt]=[];
+    byDate[dk][r.store][r.receipt].push(r);
+  });
+  Object.keys(byDate).sort().forEach(date=>{
+    let dayNet=0,dayVat=0,dayQty=0;
+    const dayRec=new Set();
+    Object.values(byDate[date]).forEach(ro=>{
+      Object.entries(ro).forEach(([rec,items])=>{
+        dayRec.add(rec);
+        items.forEach(i=>{dayNet+=Number(i.netAmount||0);dayVat+=Number(i.vatAmount||0);dayQty+=Number(i.qty||0);});
+      });
+    });
+    const tr=document.createElement('tr');tr.className='day-hdr';
+    tr.innerHTML=`
+      <td colspan="2"><strong>${date}</strong></td>
+      <td colspan="2" style="font-weight:400;font-size:10px;color:#6366f1">${dayRec.size} ใบเสร็จ · ${dayQty} ชิ้น</td>
+      <td></td><td></td>
+      <td class="r" style="font-family:var(--mono);font-size:12px">฿${fmtD(dayNet)}</td>
+      <td class="r" style="font-family:var(--mono);font-size:12px">฿${fmtD(dayVat)}</td>
+      <td colspan="6"></td>`;
+    body.appendChild(tr);
+    Object.keys(byDate[date]).sort().forEach(store=>{
+      Object.keys(byDate[date][store]).sort().forEach(receipt=>{
+        byDate[date][store][receipt].forEach(item=>{
+          const tr2=document.createElement('tr');tr2.className='detail-row';
+          const g=getGroup(store);
+          tr2.innerHTML=`
+            <td style="font-family:var(--mono);color:var(--text2)">${item.store||''}</td>
+            <td style="font-family:var(--mono);font-size:10px">${item.receipt||''}</td>
+            <td style="font-family:var(--mono);font-size:10px">${item.itemNo||''}</td>
+            <td>${item.variantCode||''}</td>
+            <td class="r" style="font-family:var(--mono)">${fmtD(item.price)}</td>
+            <td class="r">${item.qty||0}</td>
+            <td class="r" style="font-family:var(--mono);color:var(--text2);font-weight:600">${fmtD(item.netAmount)}</td>
+            <td class="r" style="font-family:var(--mono)">${fmtD(item.vatAmount)}</td>
+            <td class="r" style="font-family:var(--mono);font-weight:600;color:var(--accent)">${fmtD(item.grossAmount||0)}</td>
+            <td style="font-family:var(--mono);font-size:10px">${item.date||''}</td>
+            <td style="font-family:var(--mono);font-size:10px">${item.time||''}</td>
+            <td>${item.itemCategory||''}</td>
+            <td>${item.productGroup||''}</td>
+            <td>${item.salesStaff||''}</td>`;
+          body.appendChild(tr2);
+        });
+      });
+    });
+  });
+}
+
+/* ── TAB ─────────────────────────────────────── */
+function switchTab(t,btn){
+  curTab=t;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  btn.classList.add('on');
+  if(curData) buildMain(curData);
+}
+
+/* ── FETCH ───────────────────────────────────── */
+function todayStr(){const t=new Date();return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;}
+function monthStartStr(){const t=new Date();return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-01`;}
+function yesterdayStr(){const t=new Date();t.setDate(t.getDate()-1);return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;}
+
+function getRange(period){
+  if(period==='today')     { const s=todayStr();     return {dateFrom:s, dateTo:s}; }
+  if(period==='yesterday') { const s=yesterdayStr();  return {dateFrom:s, dateTo:s}; }
+  return {dateFrom:monthStartStr(), dateTo:todayStr()}; // month (default)
+}
+
+function setPeriod(period,btn){
+  curPeriod=period;
+  document.querySelectorAll('#periodTabs .tab').forEach(x=>x.classList.remove('on'));
+  btn.classList.add('on');
+  fetchData();
+}
+
+async function fetchData(){
+  const {dateFrom,dateTo}=getRange(curPeriod);
+  const needsMonth=curPeriod!=='month'; // Sales Target card always tracks the full month
+  $('detailDateFrom').value=dateTo;$('detailDateTo').value=dateTo;
+  $('loader').classList.add('show');setStatus('','กำลังโหลด…');hideErr();
+  try{
+    const reqs=[
+      fetch(`${API}?date_from=${dateFrom}&date_to=${dateTo}`),
+      fetch(`${API_DET}?date_from=${dateTo}&date_to=${dateTo}`)
+    ];
+    if(needsMonth) reqs.push(fetch(`${API}?date_from=${monthStartStr()}&date_to=${todayStr()}`));
+    const [r1,r2,r3]=await Promise.all(reqs);
+    if(!r1.ok) throw new Error('API HTTP '+r1.status);
+    const data=await r1.json();
+    if(data.error) throw new Error(data.error);
+    const monthData=needsMonth&&r3&&r3.ok ? await r3.json() : null;
+    render(data, monthData);
+    if(r2.ok){const det=await r2.json();buildDetailTable(det.rows||[]);$('stBadge').textContent=dateTo;}
+    setStatus('live','เชื่อมต่อแล้ว');
+  }catch(e){
+    setStatus('','โหมดตัวอย่าง · ยังเชื่อม API ไม่ได้');loadDemo();
+  }finally{$('loader').classList.remove('show');}
+}
+
+async function fetchDetail(){
+  const from=$('detailDateFrom').value,to=$('detailDateTo').value;
+  if(!from||!to) return;
+  if(from>to){alert('วันที่เริ่มต้นต้องไม่เกินวันที่สิ้นสุด');return;}
+  $('loader').classList.add('show');
+  try{
+    const r=await fetch(`${API_DET}?date_from=${from}&date_to=${to}`);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const det=await r.json();
+    buildDetailTable(det.rows||[]);
+    $('stBadge').textContent=from===to?from:`${from} – ${to}`;
+  }catch(e){showErr('โหลด Detail ไม่ได้: '+e.message);}
+  finally{$('loader').classList.remove('show');}
+}
+
+function setStatus(cls,txt){$('sdot').className='sdot'+(cls?' '+cls:'');$('stxt').textContent=txt;}
+function showErr(m){const b=$('errBanner');b.textContent=m;b.classList.add('show');}
+function hideErr(){$('errBanner').classList.remove('show');}
+
+/* ── EXPORT ──────────────────────────────────── */
+function openExport(){
+  const t=new Date(),y=t.getFullYear(),m=String(t.getMonth()+1).padStart(2,'0'),d=String(t.getDate()).padStart(2,'0');
+  $('expTo').value=`${y}-${m}-${d}`;
+  $('expFrom').value=`${y}-${m}-01`;
+  const ALL_STORES=['CCL','CLD','CLP','CWD','CWV','EML','EMQ','GCW','GPG','MDP','MEC','MGB','OL01','OL02','OS04','PS1','PS2','PS3','PS4','PS7','SC1','SC2','SCP','SCS','SHS','SPM','SPX','TTS'].sort();
+  const box=$('storeCheckboxes');
+  box.innerHTML=ALL_STORES.map(s=>`
+    <label class="store-cb">
+      <input type="checkbox" name="expStoreCb" value="${s}">
+      ${s}
+    </label>`).join('');
+  $('exportModal').classList.add('show');
+}
+
+function selectAllStores(v){
+  document.querySelectorAll('input[name="expStoreCb"]').forEach(cb=>cb.checked=v);
+}
+
+function getSelectedStores(){
+  const checked=[...document.querySelectorAll('input[name="expStoreCb"]:checked')].map(cb=>cb.value);
+  return checked.length>0 ? new Set(checked) : null; // null = ทุกสาขา
+}
+function closeExport(){$('exportModal').classList.remove('show');}
+
+async function getExportData(){
+  const from=$('expFrom').value, to=$('expTo').value;
+  const selectedStores=getSelectedStores();
+  if(!from||!to){alert('กรุณาเลือกวันที่');return null;}
+  $('loader').classList.add('show');
+  try{
+    const [r1,r2]=await Promise.all([
+      fetch(`${API}?date_from=${from}&date_to=${to}`),
+      fetch(`${API_DET}?date_from=${from}&date_to=${to}`)
+    ]);
+    const sales=r1.ok?await r1.json():null;
+    const det=r2.ok?await r2.json():null;
+    return {sales, det, from, to, selectedStores};
+  }catch(e){alert('ดึงข้อมูลไม่ได้: '+e.message);return null;}
+  finally{$('loader').classList.remove('show');}
+}
+
+function csvRow(arr){return arr.map(v=>{const s=String(v??'');return s.includes(',')||s.includes('"')?`"${s.replace(/"/g,'""')}"`:s;}).join(',');}
+
+async function doExportCSV(){
+  const d=await getExportData();if(!d) return;
+  const {sales,det,from,to,selectedStores}=d;
+  let csv='';
+  if($('cb-summary').checked&&sales){
+    csv+='=== สรุปรายวัน ===\n';
+    csv+=csvRow(['วันที่','Net Amount','ออเดอร์','ชิ้น'])+'\n';
+    (sales.daily.labels||[]).forEach((lbl,i)=>csv+=csvRow([lbl,sales.daily.revenue[i]||0,sales.daily.receipts[i]||0,sales.daily.items[i]||0])+'\n');
+    csv+='\n';
+  }
+  if($('cb-store').checked&&sales){
+    csv+='=== ยอดขายตามสาขา ===\n';
+    csv+=csvRow(['สาขา','กลุ่ม','Net Amount','ออเดอร์','ชิ้น','เฉลี่ย/ออเดอร์'])+'\n';
+    (sales.storeList||[]).filter(s=>!d.selectedStores||d.selectedStores.has(s.name)).forEach(s=>{const g=getGroup(s.name);csv+=csvRow([s.name,g?g.name:'—',s.rev,s.rec,s.items,s.rec?Math.round(s.rev/s.rec):0])+'\n';});
+    csv+='\n';
+  }
+  if($('cb-detail').checked&&det){
+    csv+='=== รายละเอียดรายการ ===\n';
+    csv+=csvRow(['Store No_','Receipt No_','Item No_','Variant Code','Price','Qty','Net Amount','VAT Amount','Date','Time','Item Category','Product Group','Sales Staff'])+'\n';
+    (det.rows||[]).filter(r=>!d.selectedStores||d.selectedStores.has(r.store)).forEach(r=>{csv+=csvRow([r.store,r.receipt,r.itemNo,r.variantCode,r.price,r.qty,r.netAmount,r.vatAmount,r.date,r.time,r.itemCategory,r.productGroup,r.salesStaff])+'\n';});
+  }
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`greyhound_sales_${from}_${to}.csv`;a.click();
+  closeExport();
+}
+
+async function doExportExcel(){
+  const d=await getExportData();if(!d) return;
+  const {sales,det,from,to,selectedStores}=d;
+  const wb=XLSX.utils.book_new();
+
+  // ── คำนวณสรุปรายวันจาก detail rows (filter สาขา) ──────
+  if($('cb-summary').checked&&sales){
+    const filteredRows=(det&&det.rows||[]).filter(r=>!selectedStores||selectedStores.has(r.store));
+    // group by วันที่
+    const dayMap={};
+    filteredRows.forEach(r=>{
+      if(!dayMap[r.date]) dayMap[r.date]={net:0,orders:new Set(),items:0};
+      dayMap[r.date].net += r.netAmount||0;
+      dayMap[r.date].orders.add(r.receipt);
+      dayMap[r.date].items += r.qty||0;
+    });
+    const rows=[['วันที่','Net Amount','ออเดอร์','ชิ้น']];
+    Object.keys(dayMap).sort().forEach(dt=>{
+      const v=dayMap[dt];
+      rows.push([dt, Math.round(v.net), v.orders.size, v.items]);
+    });
+    // ถ้าไม่ filter สาขา ใช้ยอดจาก API แทน (ครบถ้วนกว่า)
+    const useAPI=!selectedStores;
+    const finalRows=useAPI
+      ? [['วันที่','Net Amount','ออเดอร์','ชิ้น'],
+         ...(sales.daily.labels||[]).map((lbl,i)=>[lbl,sales.daily.revenue[i]||0,sales.daily.receipts[i]||0,sales.daily.items[i]||0])]
+      : rows;
+    const ws=XLSX.utils.aoa_to_sheet(finalRows);
+    // style header
+    const range=XLSX.utils.decode_range(ws['!ref']);
+    for(let c=range.s.c;c<=range.e.c;c++){
+      const cell=XLSX.utils.encode_cell({r:0,c});
+      if(!ws[cell]) continue;
+      ws[cell].s={font:{bold:true,color:{rgb:"FFFFFF"}},fill:{fgColor:{rgb:"2563EB"}},alignment:{horizontal:"center"}};
+    }
+    // column widths
+    ws['!cols']=[{wch:12},{wch:16},{wch:10},{wch:10}];
+    XLSX.utils.book_append_sheet(wb,ws,'สรุปรายวัน');
+  }
+
+  // ── ยอดขายตามสาขา ──────────────────────────────────────
+  if($('cb-store').checked&&sales){
+    const rows=[['สาขา','กลุ่ม','Net Amount','ออเดอร์','ชิ้น','เฉลี่ย/ออเดอร์']];
+    (sales.storeList||[]).filter(s=>!selectedStores||selectedStores.has(s.name)).forEach(s=>{
+      const g=getGroup(s.name);
+      rows.push([s.name,g?g.name:'—',s.rev,s.rec,s.items,s.rec?Math.round(s.rev/s.rec):0]);
+    });
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:10},{wch:14},{wch:16},{wch:10},{wch:10},{wch:16}];
+    const range=XLSX.utils.decode_range(ws['!ref']);
+    for(let c=range.s.c;c<=range.e.c;c++){
+      const cell=XLSX.utils.encode_cell({r:0,c});
+      if(!ws[cell]) continue;
+      ws[cell].s={font:{bold:true,color:{rgb:"FFFFFF"}},fill:{fgColor:{rgb:"2563EB"}},alignment:{horizontal:"center"}};
+    }
+    XLSX.utils.book_append_sheet(wb,ws,'ยอดขายตามสาขา');
+  }
+
+  // ── รายละเอียดรายการ ───────────────────────────────────
+  if($('cb-detail').checked&&det){
+    const rows=[['วันที่','สาขา','ใบเสร็จ','Item No.','Variant','Price','Qty','Net Amount','VAT Amount','Gross Amount','Time','Category','Group','Sales Staff']];
+    (det.rows||[]).filter(r=>!selectedStores||selectedStores.has(r.store)).forEach(r=>{
+      rows.push([r.date,r.store,r.receipt,r.itemNo,r.variantCode,r.price,r.qty,r.netAmount,r.vatAmount,r.grossAmount||0,r.time,r.itemCategory,r.productGroup,r.salesStaff]);
+    });
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:12},{wch:8},{wch:14},{wch:18},{wch:8},{wch:10},{wch:6},{wch:12},{wch:12},{wch:12},{wch:10},{wch:10},{wch:12},{wch:14}];
+    const range=XLSX.utils.decode_range(ws['!ref']);
+    for(let c=range.s.c;c<=range.e.c;c++){
+      const cell=XLSX.utils.encode_cell({r:0,c});
+      if(!ws[cell]) continue;
+      ws[cell].s={font:{bold:true,color:{rgb:"FFFFFF"}},fill:{fgColor:{rgb:"0F766E"}},alignment:{horizontal:"center"}};
+    }
+    // zebra rows
+    for(let r=1;r<=range.e.r;r++){
+      for(let c=range.s.c;c<=range.e.c;c++){
+        const cell=XLSX.utils.encode_cell({r,c});
+        if(!ws[cell]) ws[cell]={v:'',t:'s'};
+        ws[cell].s={...(ws[cell].s||{}),
+          fill:{fgColor:{rgb:r%2===0?'F1F5F9':'FFFFFF'}},
+          alignment:{horizontal:c>=5&&c<=9?'right':'left'}
+        };
+      }
+    }
+    XLSX.utils.book_append_sheet(wb,ws,'รายละเอียดรายการ');
+  }
+
+  // ── เพิ่ม sheet สรุปภาพรวม ────────────────────────────
+  const summaryRows=[
+    ['Greyhound Original — Sales Report'],
+    [''],
+    ['ช่วงวันที่',`${from} ถึง ${to}`],
+    ['สาขาที่เลือก', selectedStores?[...selectedStores].join(', '):'ทุกสาขา'],
+    ['สร้างเมื่อ', new Date().toLocaleString('th-TH')],
+    [''],
+    ['รายการ','ยอด'],
+    ['ยอดขาย Net Amount', sales?sales.net:0],
+    ['ยอดขาย Gross Amount', sales?sales.gross:0],
+    ['จำนวนออเดอร์', sales?sales.orders:0],
+    ['จำนวนชิ้น', sales?sales.items:0],
+    ['เฉลี่ย/ออเดอร์', sales?sales.avgPerOrder:0],
+  ];
+  const wsSummary=XLSX.utils.aoa_to_sheet(summaryRows);
+  wsSummary['!cols']=[{wch:22},{wch:30}];
+  wsSummary['A1'].s={font:{bold:true,sz:14,color:{rgb:'2563EB'}}};
+  wsSummary['A7'].s={font:{bold:true,color:{rgb:'FFFFFF'}},fill:{fgColor:{rgb:'1E40AF'}}};
+  wsSummary['B7'].s={font:{bold:true,color:{rgb:'FFFFFF'}},fill:{fgColor:{rgb:'1E40AF'}}};
+  wsSummary['!merges']=[{s:{r:0,c:0},e:{r:0,c:1}}];
+  XLSX.utils.book_append_sheet(wb,wsSummary,'ภาพรวม');
+
+  // move ภาพรวม ไปเป็น sheet แรก
+  const sheetOrder=['ภาพรวม','สรุปรายวัน','ยอดขายตามสาขา','รายละเอียดรายการ'];
+  wb.SheetNames=sheetOrder.filter(s=>wb.SheetNames.includes(s));
+
+  const storeLabel=selectedStores?[...selectedStores].join('_'):'ALL';
+  XLSX.writeFile(wb,`greyhound_sales_${storeLabel}_${from}_${to}.xlsx`,{cellStyles:true});
+  closeExport();
+}
+
+/* ── DEMO ────────────────────────────────────── */
+function loadDemo(){
+  hideErr();setStatus('live','Demo mode');
+  const t=todayStr();$('detailDateFrom').value=t;$('detailDateTo').value=t;
+  render({
+    dateRange:'01/08/2026 – 14/08/2026',generated:'14/08/2026 16:45',
+    net:5723871,gross:6124401,orders:3413,avgPerOrder:1677,
+    daily:{
+      labels:['01/08','02/08','03/08','04/08','05/08','06/08','07/08','08/08','09/08','10/08','11/08','12/08','13/08','14/08'],
+      revenue:[501203,454485,354767,387283,299273,361180,124884,649198,543584,418538,278392,484185,443355,423524],
+      receipts:[295,283,182,217,182,224,66,430,380,290,200,340,310,314]
+    },
+    storeList:[
+      {name:'MGB',rev:620000,items:520,rec:300},{name:'OL02',rev:573559,items:680,rec:400},
+      {name:'CLD',rev:550000,items:480,rec:270},{name:'GCW',rev:490000,items:440,rec:240},
+      {name:'SC1',rev:460000,items:400,rec:220},{name:'MEC',rev:368387,items:300,rec:180},
+      {name:'SHS',rev:280000,items:320,rec:160},{name:'SCP',rev:220000,items:280,rec:110},
+      {name:'GPG',rev:180000,items:140,rec:72},{name:'TTS',rev:98083,items:200,rec:100}
+    ]
+  });
+  buildDetailTable([
+    {store:'CCL',receipt:'P02517733',itemNo:'A25ME03162WH1A',variantCode:'S',price:697.50,qty:1,netAmount:651.87,vatAmount:45.63,date:'14/08/2026',time:'11:30:09',itemCategory:'ME',productGroup:'ME03',salesStaff:'PHANNIPA'},
+    {store:'EML',receipt:'P00729965',itemNo:'S26MD03032BL1A',variantCode:'M',price:1595.00,qty:1,netAmount:745.33,vatAmount:52.17,date:'14/08/2026',time:'12:48:01',itemCategory:'MD',productGroup:'MD03',salesStaff:'CHAKRIT'},
+    {store:'MEC',receipt:'P02650470',itemNo:'A25ME09012WH1A',variantCode:'40',price:1750.00,qty:1,netAmount:1635.51,vatAmount:114.49,date:'14/08/2026',time:'09:50:01',itemCategory:'ME',productGroup:'ME09',salesStaff:'WEBSITE'},
+  ]);
+}
+
+window.onload=()=>fetchData();
+</script>
+
+</body></html>
