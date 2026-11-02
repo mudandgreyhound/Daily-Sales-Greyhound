@@ -994,7 +994,9 @@ function rtRenderPulse(p){
 function rtRenderTop(t){
   const rows = (t.rows||[]).slice(0,10);
   $('rtTopBody').innerHTML = rows.length ? rows.map(x=>`<tr>
-    <td class="mono" style="font-size:10px">${x.item}</td>
+    <td>${x.name
+      ? `<div style="font-weight:600;font-size:11px">${x.name}</div><div class="mono" style="font-size:9px;color:var(--muted)">${x.item}</div>`
+      : `<span class="mono" style="font-size:10px">${x.item}</span>`}</td>
     <td class="r">${x.qty}</td>
     <td class="r mono">฿${fmtM(x.sales)}</td>
   </tr>`).join('') : rtEmpty(3);
@@ -1003,7 +1005,9 @@ function rtRenderTop(t){
 function rtRenderPromo(pr){
   const rows = (pr.rows||[]).slice(0,10);
   $('rtPromoBody').innerHTML = rows.length ? rows.map(x=>`<tr>
-    <td class="mono">${x.promotion}</td>
+    <td>${x.name
+      ? `<div style="font-weight:600;font-size:11px">${x.name}</div><div class="mono" style="font-size:9px;color:var(--muted)">${x.promotion}</div>`
+      : `<span class="mono">${x.promotion}</span>`}</td>
     <td class="r">${x.qty}</td>
     <td class="r mono">฿${fmtM(x.discountGiven)}</td>
   </tr>`).join('') : rtEmpty(3);
