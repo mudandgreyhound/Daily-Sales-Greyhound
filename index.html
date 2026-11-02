@@ -370,7 +370,7 @@ tbody tr:last-child td{border-bottom:none}
     <div class="ccard">
       <h4>โปรโมชัน (วันนี้)</h4>
       <div class="tbl-wrap"><table>
-        <thead><tr><th>Promo</th><th class="r">ชิ้น</th><th class="r">ส่วนลด</th></tr></thead>
+        <thead><tr><th>Promo</th><th class="r">ชิ้น</th><th class="r">ยอด</th></tr></thead>
         <tbody id="rtPromoBody"></tbody>
       </table></div>
     </div>
@@ -1009,7 +1009,7 @@ function rtRenderPromo(pr){
       ? `<div style="font-weight:600;font-size:11px">${x.name}</div><div class="mono" style="font-size:9px;color:var(--muted)">${x.promotion}</div>`
       : `<span class="mono">${x.promotion}</span>`}</td>
     <td class="r">${x.qty}</td>
-    <td class="r mono">฿${fmtM(x.discountGiven)}</td>
+    <td class="r mono">฿${fmtM(x.sales)}</td>
   </tr>`).join('') : rtEmpty(3);
 }
 
