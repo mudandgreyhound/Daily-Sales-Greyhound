@@ -88,10 +88,10 @@ body{margin:0;font-family:var(--sans);color:var(--text);background:var(--ground)
 
 <main class="page">
   <div class="searchbar">
-    <input class="form-input" id="q" placeholder="พิมพ์ชื่อสินค้า / รหัส / สไตล์ แล้วกด Enter  (เช่น shirt, polo, S26MO01)" autofocus>
+    <input class="form-input" id="q" placeholder="พิมพ์ชื่อ/รหัสสินค้า (เช่น shirt, S26MO01)  หรือ  รหัส/ชื่อร้าน (เช่น CCL, Mega)" autofocus>
     <button class="btn" onclick="search()">ค้นหา</button>
   </div>
-  <div class="hint" id="hint">ค้นหาว่าสินค้านี้มี stock ที่สาขาไหนบ้าง (รวมไซส์) — ข้อมูลจาก stock_ledger ทุกสาขา</div>
+  <div class="hint" id="hint">พิมพ์ <b>สินค้า</b> → ดูว่าสาขาไหนมี · พิมพ์ <b>รหัสร้าน</b> (เช่น CCL) → ดู stock ทั้งหมดของร้านนั้น</div>
   <div id="results"></div>
   <div class="footer">
     <span>Greyhound Original · Stock Finder</span>
@@ -138,8 +138,10 @@ async function search(){
 }
 
 function render(d){
-  const items = d.items||[];
   $('gen').textContent = 'ค้นหา ' + new Date().toLocaleString('th-TH');
+  if(d.mode === 'store'){ renderStore(d); return; }
+
+  const items = d.items||[];
   if(!items.length){
     $('results').innerHTML = `<div class="empty">ไม่พบสินค้าที่ตรงกับ "${d.query}" (หรือสินค้านั้นหมด stock ทุกสาขา)</div>`;
     $('hint').textContent = '';
@@ -172,6 +174,40 @@ function render(d){
 }
 
 // ค้นหาสดขณะพิมพ์ (debounce 300ms)
+// STORE MODE — ร้านเดียว โชว์สินค้าทั้งหมด
+function renderStore(d){
+  const items = d.items||[];
+  $('hint').textContent = items.length
+    ? `${d.store}${d.storeName?' · '+d.storeName:''} — ${items.length} รายการ · รวม ${fmt(d.total)} ตัว`
+    : '';
+  if(!items.length){
+    $('results').innerHTML = `<div class="empty">${d.store}${d.storeName?' · '+d.storeName:''} ยังไม่มี stock (หรือร้านนี้ยังไม่ได้ดึงข้อมูล)</div>`;
+    return;
+  }
+  const head = `
+    <div class="ccard" style="margin-bottom:12px">
+      <div class="item-hd" style="margin-bottom:0">
+        <div>
+          <div class="item-name">${d.store}${d.fresh?'<span class="live-tag">สด</span>':''}</div>
+          <div class="item-meta">${d.storeName||''} · ${items.length} รายการ</div>
+        </div>
+        <div class="item-total">${fmt(d.total)} <small>ตัว</small></div>
+      </div>
+    </div>`;
+  const rows = items.map(it=>`
+    <div class="ccard" style="margin-bottom:8px;padding:10px 16px">
+      <div class="shop" style="background:transparent;border:none;box-shadow:none;padding:0">
+        <div class="shop-id">
+          <div style="font-weight:600;font-size:12px">${it.name||it.itemNo}</div>
+          ${it.name?`<div class="shop-name" style="font-family:var(--mono)">${it.itemNo}</div>`:''}
+        </div>
+        <span class="shop-qty">${fmt(it.total)}</span>
+        <span class="sizes">${it.sizes.map(z=>`<span class="size">${z.size}·${z.qty}</span>`).join('')}</span>
+      </div>
+    </div>`).join('');
+  $('results').innerHTML = head + rows;
+}
+
 $('q').addEventListener('input', ()=>{ clearTimeout(_t); _t = setTimeout(search, 300); });
 $('q').addEventListener('keydown', e=>{ if(e.key==='Enter'){ clearTimeout(_t); search(); } });
 </script>
