@@ -1052,11 +1052,25 @@ async function loadTopHistory(from,to){
 
 /* บล็อกล่าง (GHBLIVE เสมอ): target + chart + detail */
 async function loadLower(from,to){
+  // GHBLIVE ของช่วงที่เลือก — วันนี้ GHBLIVE มักยังว่าง (เข้าตอนตี 2) จึง tolerate 404
   const sales = _histSales || await fetch(`${API}?date_from=${from}&date_to=${to}`).then(r=>r.ok?r.json():null);
   _histSales=null;
-  if(!sales) throw new Error('no sales data');
+  // Sales Target ใช้ยอดทั้งเดือนเสมอ (มีข้อมูลแม้วันนี้ว่าง)
   const monthData = await fetch(`${API}?date_from=${monthStartStr()}&date_to=${todayStr()}`).then(r=>r.ok?r.json():null);
-  render(sales, monthData||sales);
+
+  if(sales){
+    render(sales, monthData||sales);
+  } else if(monthData){
+    // ช่วงที่เลือกยังไม่มีข้อมูล GHBLIVE (วันนี้เข้าตอนตี 2) — fallback โชว์ภาพรวมเดือนแทน ไม่ให้หน้าพัง
+    render(monthData, monthData);
+    $('chartBadge').textContent = 'วันนี้ GHBLIVE ยังไม่เข้า · แสดงภาพรวมเดือน';
+  } else {
+    // ไม่มีทั้งวันนี้และเดือน — เคลียร์กราฟเฉยๆ
+    if(mainChart){ mainChart.destroy(); mainChart=null; }
+    $('mleg').innerHTML='';
+    $('chartBadge').textContent = 'ยังไม่มีข้อมูล GHBLIVE';
+  }
+
   $('detailDateFrom').value=from;$('detailDateTo').value=to;
   const det = await fetch(`${API_DET}?date_from=${from}&date_to=${to}`).then(r=>r.ok?r.json():null);
   buildDetailTable((det&&det.rows)||[]);
