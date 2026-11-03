@@ -1,101 +1,128 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Greyhound Original — Stock Inventory List</title>
+<!doctype html><html lang="th"><head><meta charset="utf8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Stock Inventory — Greyhound Original</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f0f4f8;--surf:#fff;--card:#fff;--card2:#f8fafc;
-  --border:#e2e8f0;--border2:#cbd5e1;
-  --text:#0f172a;--text2:#334155;--muted:#64748b;--muted2:#94a3b8;
-  --accent:#0891b2;--acc-lt:#06b6d4;--acc-bg:#ecfeff;--acc-border:#a5f3fc;
-  --green:#16a34a;--green-bg:#f0fdf4;--red:#dc2626;--amber:#d97706;--purple:#7c3aed;
-  --mono:'JetBrains Mono',monospace;--sans:'Inter',system-ui,sans-serif;
-  --r:12px;
-  --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-  --shadow:0 4px 12px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.04);
+  --text:#201c42;--text2:#4b4674;--muted:#6f6b96;--muted2:#9794bd;
+  --accent:#6d5efc;--acc-lt:#9b8cff;--acc-bg:rgba(109,94,252,.13);--acc-border:rgba(109,94,252,.3);
+  --glass:rgba(255,255,255,.52);--glass2:rgba(255,255,255,.4);--glass-strong:rgba(255,255,255,.72);
+  --glass-br:rgba(255,255,255,.68);--glass-sh:0 10px 34px -10px rgba(55,40,120,.32);--glass-sh-sm:0 5px 18px -8px rgba(55,40,120,.26);
+  --border2:rgba(120,110,180,.28);--line:rgba(120,110,180,.16);
+  --green:#15935a;--green-bg:rgba(21,197,118,.15);--red:#e0405b;--amber:#c8780f;--amber-bg:rgba(217,131,19,.16);
+  --ground:
+    radial-gradient(1100px 680px at 6% -10%, rgba(129,140,248,.55), transparent 60%),
+    radial-gradient(920px 640px at 102% -2%, rgba(236,72,153,.30), transparent 58%),
+    radial-gradient(1000px 760px at 72% 112%, rgba(34,211,238,.32), transparent 60%),
+    radial-gradient(900px 640px at -6% 110%, rgba(167,139,250,.40), transparent 60%),
+    linear-gradient(160deg,#eef1fe 0%,#f6f0fb 55%,#eaf4fe 100%);
+  --mono:'JetBrains Mono',ui-monospace,monospace;--sans:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;--r:18px;--r-sm:12px;
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --text:#edefff;--text2:#c7c9ef;--muted:#9a9ccb;--muted2:#74769e;
+  --accent:#a78bff;--acc-lt:#c4b5fd;--acc-bg:rgba(167,139,255,.16);--acc-border:rgba(167,139,255,.34);
+  --glass:rgba(255,255,255,.065);--glass2:rgba(255,255,255,.045);--glass-strong:rgba(255,255,255,.1);
+  --glass-br:rgba(255,255,255,.14);--glass-sh:0 14px 44px -12px rgba(0,0,0,.6);--glass-sh-sm:0 8px 22px -10px rgba(0,0,0,.55);
+  --border2:rgba(255,255,255,.12);--line:rgba(255,255,255,.09);
+  --green:#34d58a;--green-bg:rgba(52,213,138,.16);--red:#ff6b82;--amber:#f0a33c;--amber-bg:rgba(240,163,60,.16);
+  --ground:
+    radial-gradient(1100px 680px at 6% -12%, rgba(99,102,241,.42), transparent 60%),
+    radial-gradient(920px 640px at 102% -4%, rgba(190,38,120,.34), transparent 58%),
+    radial-gradient(1000px 760px at 74% 112%, rgba(14,165,183,.30), transparent 60%),
+    radial-gradient(900px 640px at -8% 110%, rgba(124,58,237,.40), transparent 60%),
+    linear-gradient(160deg,#0b0920 0%,#120f2e 55%,#0a1226 100%);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --text:#edefff;--text2:#c7c9ef;--muted:#9a9ccb;--muted2:#74769e;
+  --accent:#a78bff;--acc-lt:#c4b5fd;--acc-bg:rgba(167,139,255,.16);--acc-border:rgba(167,139,255,.34);
+  --glass:rgba(255,255,255,.065);--glass2:rgba(255,255,255,.045);--glass-strong:rgba(255,255,255,.1);
+  --glass-br:rgba(255,255,255,.14);--glass-sh:0 14px 44px -12px rgba(0,0,0,.6);--glass-sh-sm:0 8px 22px -10px rgba(0,0,0,.55);
+  --border2:rgba(255,255,255,.12);--line:rgba(255,255,255,.09);
+  --green:#34d58a;--green-bg:rgba(52,213,138,.16);--red:#ff6b82;--amber:#f0a33c;--amber-bg:rgba(240,163,60,.16);
+  --ground:
+    radial-gradient(1100px 680px at 6% -12%, rgba(99,102,241,.42), transparent 60%),
+    radial-gradient(920px 640px at 102% -4%, rgba(190,38,120,.34), transparent 58%),
+    radial-gradient(1000px 760px at 74% 112%, rgba(14,165,183,.30), transparent 60%),
+    radial-gradient(900px 640px at -8% 110%, rgba(124,58,237,.40), transparent 60%),
+    linear-gradient(160deg,#0b0920 0%,#120f2e 55%,#0a1226 100%);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:var(--sans);color:var(--text);background:var(--ground) fixed;min-height:100vh;font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-.topbar{background:var(--surf);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;gap:12px;box-shadow:var(--shadow-sm)}
-.tb-left{display:flex;align-items:center;gap:12px}
-.logo{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--acc-lt));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:600;color:#fff;box-shadow:0 2px 8px rgba(8,145,178,.35);flex-shrink:0}
-.tb-title{font-size:13px;font-weight:700}
-.tb-sub{font-size:11px;color:var(--muted)}
-.tb-right{display:flex;align-items:center;gap:8px}
-.status-pill{display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:3px 10px 3px 8px;font-size:11px;color:var(--muted)}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;height:58px;
+  padding-inline:max(18px,env(safe-area-inset-left,0px)) max(18px,env(safe-area-inset-right,0px));
+  background:var(--glass-strong);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);border-bottom:1px solid var(--glass-br)}
+.tb-left{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:36px;height:36px;flex-shrink:0;border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--accent),var(--acc-lt));box-shadow:0 4px 14px -2px rgba(109,94,252,.6)}
+.tb-title{font-size:13.5px;font-weight:700}.tb-sub{font-size:11px;color:var(--muted)}
+.tb-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.status-pill{display:flex;align-items:center;gap:6px;border-radius:20px;padding:4px 11px 4px 9px;font-size:11px;color:var(--text2);background:var(--glass);border:1px solid var(--glass-br)}
 .sdot{width:7px;height:7px;border-radius:50%;background:var(--muted2)}
-.sdot.live{background:var(--green);animation:pulse 2s infinite}
-.sdot.err{background:var(--red)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);white-space:nowrap}
-.btn:hover{background:#0e7490}
-.btn-outline{background:var(--surf);border:1px solid var(--border2);color:var(--text2);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--sans);white-space:nowrap}
-.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.sdot.live{background:var(--green);box-shadow:0 0 0 3px var(--green-bg);animation:pulse 2s infinite}
+.sdot.err{background:var(--red);box-shadow:0 0 0 3px rgba(224,64,91,.2)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.btn{border:none;border-radius:10px;padding:7px 15px;font-size:12px;font-weight:600;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--accent),var(--acc-lt));box-shadow:0 4px 14px -3px rgba(109,94,252,.55);white-space:nowrap}
+.btn:hover{filter:brightness(1.05)}
+.btn-outline{border:1px solid var(--glass-br);border-radius:10px;padding:7px 15px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);background:var(--glass);white-space:nowrap}
+.btn-outline:hover{color:var(--accent);border-color:var(--acc-border);background:var(--acc-bg)}
 
-.navtabs{display:flex;gap:4px;background:var(--surf);border-bottom:1px solid var(--border);padding:0 24px}
-.navtab{padding:12px 20px;font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;border-bottom:2px solid transparent}
-.navtab:hover{color:var(--text)}
-.navtab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.navtabs{display:flex;gap:4px;padding-inline:max(18px,env(safe-area-inset-left,0px)) max(18px,env(safe-area-inset-right,0px));
+  background:var(--glass2);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.navtab{padding:12px 18px;font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;border-bottom:2px solid transparent}
+.navtab:hover{color:var(--text)}.navtab.on{color:var(--accent);border-bottom-color:var(--accent)}
 
-.page{max-width:1600px;margin:0 auto;padding:16px 24px 40px}
+.page{max-width:1600px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));padding-block:18px 48px;display:flex;flex-direction:column;gap:16px}
 
-.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-sm);margin-bottom:16px}
-.panel-head{padding:10px 18px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--card2);border-radius:var(--r) var(--r) 0 0}
-.panel-body{padding:16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.glass-card{border-radius:var(--r);background:var(--glass);border:1px solid var(--glass-br);box-shadow:var(--glass-sh);backdrop-filter:blur(20px) saturate(155%);-webkit-backdrop-filter:blur(20px) saturate(155%)}
+.panel-head{padding:12px 20px;border-bottom:1px solid var(--line);font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.panel-body{padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:24px}
 @media(max-width:800px){.panel-body{grid-template-columns:1fr}}
-.filter-grid{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:center}
-.filter-label{font-size:12px;color:var(--text2);font-weight:500;white-space:nowrap}
-.filter-input,.filter-select{background:var(--card2);border:1px solid var(--border2);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--text);outline:none;font-family:var(--sans);width:100%}
-.filter-input:focus,.filter-select:focus{border-color:var(--accent)}
-.summary-grid{display:grid;grid-template-columns:auto 1fr;gap:10px 12px;align-items:center;align-content:start}
-.summary-label{font-size:12px;color:var(--text2);font-weight:500}
-.summary-value{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent);background:var(--acc-bg);border:1px solid var(--acc-border);border-radius:6px;padding:4px 12px;text-align:right}
-.cb-inline{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
-.cb-inline input{accent-color:var(--accent)}
 
-.store-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
-.store-select{background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;font-size:13px;color:var(--text);outline:none;font-family:var(--sans);font-weight:600;min-width:220px}
-.store-select:focus{border-color:var(--accent)}
+.store-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.form-input,.form-select{border:1px solid var(--border2);border-radius:10px;padding:8px 12px;font-size:13px;color:var(--text);outline:none;background:var(--glass2);font-family:var(--sans);width:100%}
+.form-input:focus,.form-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--acc-bg)}
+.store-select{min-width:260px;width:auto;font-weight:600}
 
-.tcard{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border)}
-.tcard-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.tcard-title{font-size:13px;font-weight:600}
-.tbl-scroll{overflow:auto;max-height:calc(100vh - 360px)}
+.filter-grid{display:grid;grid-template-columns:auto 1fr;gap:9px 12px;align-items:center}
+.filter-label{font-size:12px;color:var(--text2);font-weight:600;white-space:nowrap}
+.summary-grid{display:grid;grid-template-columns:auto 1fr;gap:11px 12px;align-items:center;align-content:start}
+.summary-label{font-size:12px;color:var(--text2);font-weight:600}
+.summary-value{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent);background:var(--acc-bg);border:1px solid var(--acc-border);border-radius:8px;padding:5px 12px;text-align:right}
+
+.tcard{border-radius:var(--r);overflow:hidden;background:var(--glass);border:1px solid var(--glass-br);box-shadow:var(--glass-sh);backdrop-filter:blur(20px) saturate(155%);-webkit-backdrop-filter:blur(20px) saturate(155%)}
+.tcard-head{padding:12px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.tcard-title{font-size:13px;font-weight:700}
+.tbl-scroll{overflow:auto;max-height:calc(100vh - 380px)}
 table{width:100%;border-collapse:collapse;font-size:12px}
-thead th{text-align:left;padding:8px 10px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);background:#f8fafc;white-space:nowrap;position:sticky;top:0;z-index:5}
-th.r,td.r{text-align:right}
-tbody tr:hover{background:var(--acc-bg)}
-tbody td{padding:7px 10px;border-bottom:1px solid #f1f5f9;font-size:12px;color:var(--text2);white-space:nowrap}
-tbody tr:last-child td{border-bottom:none}
-.mono{font-family:var(--mono)}
-.hl{font-weight:700;color:var(--text)}
-.qty-actual{font-weight:700;color:var(--accent)}
+thead th{text-align:left;padding:9px 12px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);white-space:nowrap;
+  border-bottom:1px solid var(--glass-br);background:var(--glass2);position:sticky;top:0;z-index:5;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+th.r,td.r{text-align:right;font-variant-numeric:tabular-nums}
+tbody td{padding:8px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--text2);white-space:nowrap}
+tbody tr{transition:background .12s}tbody tr:hover{background:var(--acc-bg)}tbody tr:last-child td{border-bottom:none}
+.mono{font-family:var(--mono)}.hl{font-weight:700;color:var(--text)}.qty-actual{font-weight:700;color:var(--accent)}
 
-.overlay{display:none;position:fixed;inset:0;background:rgba(248,250,252,.75);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:14px;backdrop-filter:blur(2px)}
+.overlay{display:none;position:fixed;inset:0;z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:rgba(240,243,252,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .overlay.show{display:flex}
-.spin{width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite}
+.spin{width:36px;height:36px;border:3px solid var(--glass-br);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-.errbanner{display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--red)}
+.errbanner{display:none;background:rgba(224,64,91,.13);border:1px solid var(--red);border-radius:12px;padding:10px 14px;font-size:12px;color:var(--red)}
 .errbanner.show{display:block}
 .empty{text-align:center;color:var(--muted);padding:30px}
-</style>
-</head>
-<body>
-<div class="overlay" id="loader"><div class="spin"></div><div style="font-size:12px;color:var(--muted)">กำลังดึงข้อมูล...</div></div>
+</style></head><body>
+
+<div class="overlay" id="loader"><div class="spin"></div><div style="font-size:12px;color:var(--text2)">กำลังดึงข้อมูล...</div></div>
 
 <header class="topbar">
   <div class="tb-left">
     <div class="logo">GH</div>
-    <div>
-      <div class="tb-title">Greyhound Original · Store Inventory List</div>
-      <div class="tb-sub" id="genTime">—</div>
-    </div>
+    <div><div class="tb-title">Stock Inventory · Greyhound Original</div><div class="tb-sub" id="genTime">—</div></div>
   </div>
   <div class="tb-right">
     <div class="status-pill"><span class="sdot" id="sdot"></span><span id="stxt">ยังไม่ได้โหลด</span></div>
@@ -107,49 +134,48 @@ tbody tr:last-child td{border-bottom:none}
 <nav class="navtabs">
   <a href="index.html" class="navtab">📊 ยอดขาย</a>
   <a href="stock.html" class="navtab on">📦 สต๊อกสินค้า</a>
+  <a href="stock-find.html" class="navtab">🔎 ค้นหาสินค้า</a>
 </nav>
 
 <main class="page">
   <div class="errbanner" id="errBanner"></div>
 
-  <div class="store-bar">
-    <span style="font-size:12px;color:var(--muted);font-weight:600">เลือกสาขา:</span>
-    <select class="store-select" id="storeSelect" onchange="loadStore()">
-      <option value="">— เลือกสาขา —</option>
-    </select>
-    <span style="font-size:11px;color:var(--muted)" id="storeInfo"></span>
+  <div class="glass-card" style="padding:14px 20px">
+    <div class="store-bar">
+      <span style="font-size:12px;color:var(--muted);font-weight:600">เลือกสาขา:</span>
+      <select class="form-select store-select" id="storeSelect" onchange="loadStore()">
+        <option value="">— เลือกสาขา —</option>
+      </select>
+      <span style="font-size:11px;color:var(--muted)" id="storeInfo"></span>
+    </div>
   </div>
 
-  <div class="panel">
-    <div class="panel-head">Filter & Summaries</div>
+  <div class="glass-card">
+    <div class="panel-head">Filter &amp; Summaries</div>
     <div class="panel-body">
       <div class="filter-grid">
         <span class="filter-label">Store Filter</span>
-        <input class="filter-input" id="fStore" placeholder="ค้นหา Store No." oninput="applyFilter()">
+        <input class="form-input" id="fStore" placeholder="ค้นหา Store No." oninput="applyFilter()">
         <span class="filter-label">Location Filter</span>
-        <input class="filter-input" id="fLocation" placeholder="ค้นหา Location Code" oninput="applyFilter()">
-        <span class="filter-label">Item Category Filter</span>
-        <select class="filter-select" id="fCategory" onchange="applyFilter()"><option value="">ทั้งหมด</option></select>
-        <span class="filter-label">Product Grp. Filter</span>
-        <select class="filter-select" id="fGroup" onchange="applyFilter()"><option value="">ทั้งหมด</option></select>
+        <input class="form-input" id="fLocation" placeholder="ค้นหา Location Code" oninput="applyFilter()">
+        <span class="filter-label">Item Category</span>
+        <select class="form-select" id="fCategory" onchange="applyFilter()"><option value="">ทั้งหมด</option></select>
+        <span class="filter-label">Product Group</span>
+        <select class="form-select" id="fGroup" onchange="applyFilter()"><option value="">ทั้งหมด</option></select>
         <span class="filter-label">Item No. Filter</span>
-        <input class="filter-input" id="fItemNo" placeholder="ค้นหา Item No." oninput="applyFilter()">
+        <input class="form-input" id="fItemNo" placeholder="ค้นหา Item No." oninput="applyFilter()">
         <span class="filter-label">Size Filter</span>
-        <input class="filter-input" id="fSize" placeholder="ค้นหา Size" oninput="applyFilter()">
-        <span></span>
-        <button class="btn" onclick="applyFilter()" style="justify-self:start;margin-top:4px">🔄 Update Filter</button>
+        <input class="form-input" id="fSize" placeholder="ค้นหา Size" oninput="applyFilter()">
       </div>
-      <div>
-        <div class="summary-grid">
-          <span class="summary-label">Total Quantity</span>
-          <span class="summary-value" id="sTotalQty">0</span>
-          <span class="summary-label">Sold Not Post</span>
-          <span class="summary-value" id="sSoldNotPost">0</span>
-          <span class="summary-label">Actual Inventory</span>
-          <span class="summary-value" id="sActualStock">0</span>
-          <span class="summary-label">แสดง / ทั้งหมด</span>
-          <span class="summary-value" id="sRowCount">0 / 0</span>
-        </div>
+      <div class="summary-grid">
+        <span class="summary-label">Total Quantity</span>
+        <span class="summary-value" id="sTotalQty">0</span>
+        <span class="summary-label">Sold Not Post</span>
+        <span class="summary-value" id="sSoldNotPost">0</span>
+        <span class="summary-label">Actual Inventory</span>
+        <span class="summary-value" id="sActualStock">0</span>
+        <span class="summary-label">แสดง / ทั้งหมด</span>
+        <span class="summary-value" id="sRowCount">0 / 0</span>
       </div>
     </div>
   </div>
@@ -162,20 +188,12 @@ tbody tr:last-child td{border-bottom:none}
       <table>
         <thead>
           <tr>
-            <th>Item Code</th>
-            <th>Size</th>
-            <th class="r">Total Qty</th>
-            <th class="r">Sold Not Post</th>
-            <th class="r">Actual Stock</th>
-            <th>Store No.</th>
-            <th>Location Code</th>
-            <th>Category</th>
-            <th>Product Group</th>
+            <th>Item Code</th><th>Size</th>
+            <th class="r">Total Qty</th><th class="r">Sold Not Post</th><th class="r">Actual Stock</th>
+            <th>Store No.</th><th>Location Code</th><th>Category</th><th>Product Group</th>
           </tr>
         </thead>
-        <tbody id="tblBody">
-          <tr><td colspan="9" class="empty">เลือกสาขาเพื่อดูข้อมูล</td></tr>
-        </tbody>
+        <tbody id="tblBody"><tr><td colspan="9" class="empty">เลือกสาขาเพื่อดูข้อมูล</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -184,9 +202,17 @@ tbody tr:last-child td{border-bottom:none}
 <script>
 const API_STOCK     = "https://greyhound_api.mobile1234.site/api/stock";
 const API_STOCK_DET = "https://greyhound_api.mobile1234.site/api/stock/detail";
-
 const $=id=>document.getElementById(id);
 const fmtN=n=>new Intl.NumberFormat('th-TH').format(Math.round(Math.abs(n)));
+const STORE_NAMES={
+  CCL:'FS10-The Circle Ratchapruk',CLD:'FS03-Central Ladprao',CLP:'CDS Central Ladprao',
+  CWD:'Central World CDS',CWV:'SmileyHound Central Westville',EML:'FS06-CentralPlaza WestGate',
+  EMQ:'Smileyhound Fashion Island',GPG:'FS04-GREYHOUND Siam Paragon',MGB:'FS12-Mega Bangna',
+  SC1:'FS01-Siam Center 1',SC2:'FS02-Smileyhound CentralWorld',SCS:'FS15 Seacon Srinakarin',
+  SHS:'FS07-Smiley hound Siam Center',SPM:'DC03-Siam paragon SMH',MEC:'Website',
+  SPX:'Shopee',TTS:'Tiktok',OL01:'OL01-Outlet Team 1',OL02:'OL02-Outlet Team 2',OS04:'OS04'
+};
+const storeName=c=>STORE_NAMES[c]||'';
 
 let allRows=[], curStore='';
 
@@ -197,12 +223,12 @@ async function loadStoreList(){
     if(!r.ok) throw new Error('HTTP '+r.status);
     const d=await r.json();
     const sel=$('storeSelect');
-    // เรียงตามอักษร
     const stores=(d.stores||[]).slice().sort((a,b)=>a.store.localeCompare(b.store));
     stores.forEach(s=>{
       const opt=document.createElement('option');
       opt.value=s.store;
-      opt.textContent=`${s.store} (${s.location}) — ${s.totalQty.toLocaleString('th-TH')} ชิ้น`;
+      const nm=storeName(s.store);
+      opt.textContent=`${s.store}${nm?' · '+nm:''} — ${s.totalQty.toLocaleString('th-TH')} ชิ้น`;
       sel.appendChild(opt);
     });
     $('genTime').textContent='อัปเดต '+(d.generated||'—');
@@ -221,7 +247,8 @@ async function loadStore(){
     if(!r.ok) throw new Error('HTTP '+r.status);
     const d=await r.json();
     allRows=d.rows||[];
-    $('tblTitle').textContent=`รายการสินค้า — ${store} (${d.total} รายการ)`;
+    const nm=storeName(store);
+    $('tblTitle').textContent=`รายการสินค้า — ${store}${nm?' · '+nm:''} (${d.total} รายการ)`;
     $('storeInfo').textContent=`${d.total} รายการ`;
     buildFilterOptions(allRows);
     applyFilter();
@@ -230,7 +257,7 @@ async function loadStore(){
 }
 
 function buildFilterOptions(rows){
-  const uniq=(key)=>[...new Set(rows.map(r=>r[key]).filter(v=>v))].sort();
+  const uniq=key=>[...new Set(rows.map(r=>r[key]).filter(v=>v))].sort();
   const fill=(id,vals)=>{
     const sel=$(id),cur=sel.value;
     sel.innerHTML='<option value="">ทั้งหมด</option>';
@@ -245,7 +272,6 @@ function applyFilter(){
   const fSto=$('fStore').value.toUpperCase(), fLoc=$('fLocation').value.toUpperCase(),
         fCat=$('fCategory').value, fGrp=$('fGroup').value,
         fItem=$('fItemNo').value.toUpperCase(), fSize=$('fSize').value.toUpperCase();
-
   const filtered=allRows.filter(r=>{
     if(fSto && !String(r.store).toUpperCase().includes(fSto)) return false;
     if(fLoc && !String(r.location).toUpperCase().includes(fLoc)) return false;
@@ -255,18 +281,14 @@ function applyFilter(){
     if(fSize && !String(r.size).toUpperCase().includes(fSize)) return false;
     return true;
   });
-
   buildTable(filtered);
   updateSummary(filtered);
 }
 
 function updateSummary(rows){
-  const tQty=rows.reduce((a,r)=>a+(r.totalQty||0),0);
-  const tSold=rows.reduce((a,r)=>a+(r.soldNotPost||0),0);
-  const tActual=rows.reduce((a,r)=>a+(r.actualStock||0),0);
-  $('sTotalQty').textContent=fmtN(tQty);
-  $('sSoldNotPost').textContent=fmtN(tSold);
-  $('sActualStock').textContent=fmtN(tActual);
+  $('sTotalQty').textContent=fmtN(rows.reduce((a,r)=>a+(r.totalQty||0),0));
+  $('sSoldNotPost').textContent=fmtN(rows.reduce((a,r)=>a+(r.soldNotPost||0),0));
+  $('sActualStock').textContent=fmtN(rows.reduce((a,r)=>a+(r.actualStock||0),0));
   $('sRowCount').textContent=`${rows.length} / ${allRows.length}`;
 }
 
@@ -317,5 +339,4 @@ function loadDemo(){
 
 window.onload=()=>loadStoreList();
 </script>
-</body>
-</html>
+</body></html>
