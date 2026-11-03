@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Greyhound Original — Stock Inventory List</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f4f8;--surf:#fff;--card:#fff;--card2:#f8fafc;
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --text:#0f172a;--text2:#334155;--muted:#64748b;--muted2:#94a3b8;
+  --accent:#0891b2;--acc-lt:#06b6d4;--acc-bg:#ecfeff;--acc-border:#a5f3fc;
+  --green:#16a34a;--green-bg:#f0fdf4;--red:#dc2626;--amber:#d97706;--purple:#7c3aed;
+  --mono:'JetBrains Mono',monospace;--sans:'Inter',system-ui,sans-serif;
+  --r:12px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow:0 4px 12px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.04);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+.topbar{background:var(--surf);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;gap:12px;box-shadow:var(--shadow-sm)}
+.tb-left{display:flex;align-items:center;gap:12px}
+.logo{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--acc-lt));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:600;color:#fff;box-shadow:0 2px 8px rgba(8,145,178,.35);flex-shrink:0}
+.tb-title{font-size:13px;font-weight:700}
+.tb-sub{font-size:11px;color:var(--muted)}
+.tb-right{display:flex;align-items:center;gap:8px}
+.status-pill{display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:3px 10px 3px 8px;font-size:11px;color:var(--muted)}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--muted2)}
+.sdot.live{background:var(--green);animation:pulse 2s infinite}
+.sdot.err{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);white-space:nowrap}
+.btn:hover{background:#0e7490}
+.btn-outline{background:var(--surf);border:1px solid var(--border2);color:var(--text2);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--sans);white-space:nowrap}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+
+.navtabs{display:flex;gap:4px;background:var(--surf);border-bottom:1px solid var(--border);padding:0 24px}
+.navtab{padding:12px 20px;font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;border-bottom:2px solid transparent}
+.navtab:hover{color:var(--text)}
+.navtab.on{color:var(--accent);border-bottom-color:var(--accent)}
+
+.page{max-width:1600px;margin:0 auto;padding:16px 24px 40px}
+
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-sm);margin-bottom:16px}
+.panel-head{padding:10px 18px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--card2);border-radius:var(--r) var(--r) 0 0}
+.panel-body{padding:16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:800px){.panel-body{grid-template-columns:1fr}}
+.filter-grid{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:center}
+.filter-label{font-size:12px;color:var(--text2);font-weight:500;white-space:nowrap}
+.filter-input,.filter-select{background:var(--card2);border:1px solid var(--border2);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--text);outline:none;font-family:var(--sans);width:100%}
+.filter-input:focus,.filter-select:focus{border-color:var(--accent)}
+.summary-grid{display:grid;grid-template-columns:auto 1fr;gap:10px 12px;align-items:center;align-content:start}
+.summary-label{font-size:12px;color:var(--text2);font-weight:500}
+.summary-value{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent);background:var(--acc-bg);border:1px solid var(--acc-border);border-radius:6px;padding:4px 12px;text-align:right}
+.cb-inline{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
+.cb-inline input{accent-color:var(--accent)}
+
+.store-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.store-select{background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;font-size:13px;color:var(--text);outline:none;font-family:var(--sans);font-weight:600;min-width:220px}
+.store-select:focus{border-color:var(--accent)}
+
+.tcard{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border)}
+.tcard-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.tcard-title{font-size:13px;font-weight:600}
+.tbl-scroll{overflow:auto;max-height:calc(100vh - 360px)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{text-align:left;padding:8px 10px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);background:#f8fafc;white-space:nowrap;position:sticky;top:0;z-index:5}
+th.r,td.r{text-align:right}
+tbody tr:hover{background:var(--acc-bg)}
+tbody td{padding:7px 10px;border-bottom:1px solid #f1f5f9;font-size:12px;color:var(--text2);white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+.mono{font-family:var(--mono)}
+.hl{font-weight:700;color:var(--text)}
+.qty-actual{font-weight:700;color:var(--accent)}
+
+.overlay{display:none;position:fixed;inset:0;background:rgba(248,250,252,.75);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:14px;backdrop-filter:blur(2px)}
+.overlay.show{display:flex}
+.spin{width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.errbanner{display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--red)}
+.errbanner.show{display:block}
+.empty{text-align:center;color:var(--muted);padding:30px}
+</style>
+</head>
+<body>
+<div class="overlay" id="loader"><div class="spin"></div><div style="font-size:12px;color:var(--muted)">กำลังดึงข้อมูล...</div></div>
+
+<header class="topbar">
+  <div class="tb-left">
+    <div class="logo">GH</div>
+    <div>
+      <div class="tb-title">Greyhound Original · Store Inventory List</div>
+      <div class="tb-sub" id="genTime">—</div>
+    </div>
+  </div>
+  <div class="tb-right">
+    <div class="status-pill"><span class="sdot" id="sdot"></span><span id="stxt">ยังไม่ได้โหลด</span></div>
+    <button class="btn-outline" onclick="exportData()">⬇ Export</button>
+    <button class="btn" onclick="loadStore()">⟳ รีเฟรช</button>
+  </div>
+</header>
+
+<nav class="navtabs">
+  <a href="index.html" class="navtab">📊 ยอดขาย</a>
+  <a href="stock.html" class="navtab on">📦 สต๊อกสินค้า</a>
+</nav>
+
+<main class="page">
+  <div class="errbanner" id="errBanner"></div>
+
+  <div class="store-bar">
+    <span style="font-size:12px;color:var(--muted);font-weight:600">เลือกสาขา:</span>
+    <select class="store-select" id="storeSelect" onchange="loadStore()">
+      <option value="">— เลือกสาขา —</option>
+    </select>
+    <span style="font-size:11px;color:var(--muted)" id="storeInfo"></span>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">Filter & Summaries</div>
+    <div class="panel-body">
+      <div class="filter-grid">
+        <span class="filter-label">Store Filter</span>
+        <input class="filter-input" id="fStore" placeholder="ค้นหา Store No." oninput="applyFilter()">
+        <span class="filter-label">Location Filter</span>
+        <input class="filter-input" id="fLocation" placeholder="ค้นหา Location Code" oninput="applyFilter()">
+        <span class="filter-label">Item Category Filter</span>
+        <select class="filter-select" id="fCategory" onchange="applyFilter()"><option value="">ทั้งหมด</option></select>
+        <span class="filter-label">Product Grp. Filter</span>
+        <select class="filter-select" id="fGroup" onchange="applyFilter()"><option value="">ทั้งหมด</option></select>
+        <span class="filter-label">Item No. Filter</span>
+        <input class="filter-input" id="fItemNo" placeholder="ค้นหา Item No." oninput="applyFilter()">
+        <span class="filter-label">Size Filter</span>
+        <input class="filter-input" id="fSize" placeholder="ค้นหา Size" oninput="applyFilter()">
+        <span></span>
+        <button class="btn" onclick="applyFilter()" style="justify-self:start;margin-top:4px">🔄 Update Filter</button>
+      </div>
+      <div>
+        <div class="summary-grid">
+          <span class="summary-label">Total Quantity</span>
+          <span class="summary-value" id="sTotalQty">0</span>
+          <span class="summary-label">Sold Not Post</span>
+          <span class="summary-value" id="sSoldNotPost">0</span>
+          <span class="summary-label">Actual Inventory</span>
+          <span class="summary-value" id="sActualStock">0</span>
+          <span class="summary-label">แสดง / ทั้งหมด</span>
+          <span class="summary-value" id="sRowCount">0 / 0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tcard">
+    <div class="tcard-head">
+      <div class="tcard-title" id="tblTitle">รายการสินค้า</div>
+    </div>
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Item Code</th>
+            <th>Size</th>
+            <th class="r">Total Qty</th>
+            <th class="r">Sold Not Post</th>
+            <th class="r">Actual Stock</th>
+            <th>Store No.</th>
+            <th>Location Code</th>
+            <th>Category</th>
+            <th>Product Group</th>
+          </tr>
+        </thead>
+        <tbody id="tblBody">
+          <tr><td colspan="9" class="empty">เลือกสาขาเพื่อดูข้อมูล</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+const API_STOCK     = "https://greyhound_api.mobile1234.site/api/stock";
+const API_STOCK_DET = "https://greyhound_api.mobile1234.site/api/stock/detail";
+
+const $=id=>document.getElementById(id);
+const fmtN=n=>new Intl.NumberFormat('th-TH').format(Math.round(Math.abs(n)));
+
+let allRows=[], curStore='';
+
+async function loadStoreList(){
+  $('loader').classList.add('show');setStatus('','กำลังโหลด…');hideErr();
+  try{
+    const r=await fetch(API_STOCK);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    const sel=$('storeSelect');
+    // เรียงตามอักษร
+    const stores=(d.stores||[]).slice().sort((a,b)=>a.store.localeCompare(b.store));
+    stores.forEach(s=>{
+      const opt=document.createElement('option');
+      opt.value=s.store;
+      opt.textContent=`${s.store} (${s.location}) — ${s.totalQty.toLocaleString('th-TH')} ชิ้น`;
+      sel.appendChild(opt);
+    });
+    $('genTime').textContent='อัปเดต '+(d.generated||'—');
+    setStatus('live','เชื่อมต่อแล้ว');
+  }catch(e){setStatus('err','เชื่อมต่อไม่ได้');showErr('ข้อผิดพลาด: '+e.message);loadDemo();}
+  finally{$('loader').classList.remove('show');}
+}
+
+async function loadStore(){
+  const store=$('storeSelect').value;
+  if(!store){allRows=[];$('tblBody').innerHTML='<tr><td colspan="9" class="empty">เลือกสาขาเพื่อดูข้อมูล</td></tr>';return;}
+  curStore=store;
+  $('loader').classList.add('show');hideErr();
+  try{
+    const r=await fetch(`${API_STOCK_DET}?store=${store}`);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    allRows=d.rows||[];
+    $('tblTitle').textContent=`รายการสินค้า — ${store} (${d.total} รายการ)`;
+    $('storeInfo').textContent=`${d.total} รายการ`;
+    buildFilterOptions(allRows);
+    applyFilter();
+  }catch(e){showErr('โหลดไม่ได้: '+e.message);}
+  finally{$('loader').classList.remove('show');}
+}
+
+function buildFilterOptions(rows){
+  const uniq=(key)=>[...new Set(rows.map(r=>r[key]).filter(v=>v))].sort();
+  const fill=(id,vals)=>{
+    const sel=$(id),cur=sel.value;
+    sel.innerHTML='<option value="">ทั้งหมด</option>';
+    vals.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o);});
+    sel.value=cur;
+  };
+  fill('fCategory',uniq('category'));
+  fill('fGroup',uniq('productGroup'));
+}
+
+function applyFilter(){
+  const fSto=$('fStore').value.toUpperCase(), fLoc=$('fLocation').value.toUpperCase(),
+        fCat=$('fCategory').value, fGrp=$('fGroup').value,
+        fItem=$('fItemNo').value.toUpperCase(), fSize=$('fSize').value.toUpperCase();
+
+  const filtered=allRows.filter(r=>{
+    if(fSto && !String(r.store).toUpperCase().includes(fSto)) return false;
+    if(fLoc && !String(r.location).toUpperCase().includes(fLoc)) return false;
+    if(fCat && r.category!==fCat) return false;
+    if(fGrp && r.productGroup!==fGrp) return false;
+    if(fItem && !r.itemNo.toUpperCase().includes(fItem)) return false;
+    if(fSize && !String(r.size).toUpperCase().includes(fSize)) return false;
+    return true;
+  });
+
+  buildTable(filtered);
+  updateSummary(filtered);
+}
+
+function updateSummary(rows){
+  const tQty=rows.reduce((a,r)=>a+(r.totalQty||0),0);
+  const tSold=rows.reduce((a,r)=>a+(r.soldNotPost||0),0);
+  const tActual=rows.reduce((a,r)=>a+(r.actualStock||0),0);
+  $('sTotalQty').textContent=fmtN(tQty);
+  $('sSoldNotPost').textContent=fmtN(tSold);
+  $('sActualStock').textContent=fmtN(tActual);
+  $('sRowCount').textContent=`${rows.length} / ${allRows.length}`;
+}
+
+function buildTable(rows){
+  const body=$('tblBody');
+  if(rows.length===0){body.innerHTML='<tr><td colspan="9" class="empty">ไม่มีข้อมูลตามเงื่อนไข</td></tr>';return;}
+  body.innerHTML=rows.map(r=>`<tr>
+    <td class="mono">${r.itemNo}</td>
+    <td class="hl">${r.size||''}</td>
+    <td class="r mono">${r.totalQty||''}</td>
+    <td class="r mono" style="color:${r.soldNotPost>0?'var(--amber)':'var(--muted2)'}">${r.soldNotPost||''}</td>
+    <td class="r mono qty-actual">${r.actualStock||''}</td>
+    <td class="hl">${r.store}</td>
+    <td class="mono" style="font-size:11px">${r.location}</td>
+    <td>${r.category||''}</td>
+    <td>${r.productGroup||''}</td>
+  </tr>`).join('');
+}
+
+function exportData(){
+  if(allRows.length===0){alert('ยังไม่มีข้อมูล');return;}
+  const wb=XLSX.utils.book_new();
+  const head=['Item Code','Size','Total Qty','Sold Not Post','Actual Stock','Store No.','Location Code','Category','Product Group'];
+  const rows=[head];
+  allRows.forEach(r=>rows.push([r.itemNo,r.size,r.totalQty,r.soldNotPost,r.actualStock,r.store,r.location,r.category,r.productGroup]));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),`Stock_${curStore}`);
+  XLSX.writeFile(wb,`greyhound_stock_${curStore}_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+function setStatus(cls,txt){$('sdot').className='sdot'+(cls?' '+cls:'');$('stxt').textContent=txt;}
+function showErr(m){const b=$('errBanner');b.textContent=m;b.classList.add('show');}
+function hideErr(){$('errBanner').classList.remove('show');}
+
+function loadDemo(){
+  setStatus('live','Demo mode');
+  const sel=$('storeSelect');
+  ['CLD','MGB','SC1'].sort().forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s+' (Demo)';sel.appendChild(o);});
+  sel.value='CLD';curStore='CLD';
+  allRows=[
+    {itemNo:'S26MD01132GR1A',size:'S',totalQty:4,soldNotPost:0,actualStock:4,store:'CLD',location:'FS03',category:'MD',productGroup:'MD01'},
+    {itemNo:'S26MD01132NB1A',size:'2L',totalQty:2,soldNotPost:0,actualStock:2,store:'CLD',location:'FS03',category:'MD',productGroup:'MD01'},
+    {itemNo:'S26MD01132NB1A',size:'L',totalQty:3,soldNotPost:0,actualStock:3,store:'CLD',location:'FS03',category:'MD',productGroup:'MD01'},
+    {itemNo:'S26MD01132NB1A',size:'M',totalQty:5,soldNotPost:0,actualStock:5,store:'CLD',location:'FS03',category:'MD',productGroup:'MD01'},
+  ];
+  buildFilterOptions(allRows);applyFilter();
+  $('tblTitle').textContent='รายการสินค้า — CLD (Demo)';
+}
+
+window.onload=()=>loadStoreList();
+</script>
+</body>
+</html>
